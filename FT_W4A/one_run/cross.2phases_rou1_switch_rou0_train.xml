@@ -1,0 +1,13 @@
+<routes>
+    <flow id="01" type="moped"  begin="0" end="36000" probability="0.21" from="WtoC" to="CtoE" departSpeed="5.0" />
+    <flow id="11" type="passenger"  begin="0" end="36000" probability="0.09" from="WtoC" to="CtoE" departSpeed="5.0" />
+    
+    <flow id="02" type="moped"  begin="0" end="36000" probability="0.21" from="EtoC" to="CtoW" departSpeed="5.0" />
+    <flow id="12" type="passenger"  begin="0" end="36000" probability="0.09" from="EtoC" to="CtoW" departSpeed="5.0" />
+
+    <flow id="03" type="moped"  begin="36001" end="72000" probability="0.21" from="StoC" to="CtoN" departSpeed="5.0" />
+    <flow id="13" type="passenger"  begin="36001" end="72000" probability="0.09" from="StoC" to="CtoN" departSpeed="5.0" />
+
+    <flow id="04" type="moped"  begin="36001" end="72000" probability="0.21" from="NtoC" to="CtoS" departSpeed="5.0" />
+    <flow id="14" type="passenger"  begin="36001" end="72000" probability="0.09" from="NtoC" to="CtoS" departSpeed="5.0" />
+</routes>
