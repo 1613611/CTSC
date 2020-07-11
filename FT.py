@@ -2,6 +2,7 @@ import os
 import sys
 import argparse
 import numpy as np
+from prettytable import PrettyTable
 if 'SUMO_HOME' in os.environ:
     tools = os.path.join(os.environ['SUMO_HOME'], 'tools')
     sys.path.append(tools)
@@ -12,7 +13,7 @@ import traci
 
 parser = argparse.ArgumentParser() 
 parser.add_argument("--gui", action='store_true', help = "Enable gui")
-parser.add_argument('--net-file', type=str, dest="net_file", help='Name of the net file')
+parser.add_argument('--test-site', type=str, dest="net_file", help='Name of the net file')
 parser.add_argument("--light-traffic", action='store_true', dest="light_traffic", default=False, help = "Use workload of light traffic") 
 parser.add_argument("--heavy-traffic", action='store_true', dest="heavy_traffic", default=False, help = "Use workload of heavy traffic") 
 args = parser.parse_args()
@@ -113,7 +114,15 @@ class Simulation_FT():
 
     def isFinised(self):
         if traci.simulation.getMinExpectedNumber() <= 0:
+            self.log_step()
             traci.close()
+            
+            t = PrettyTable(['Feature', 'Value'])
+            t.add_row(['Average Queue Length', np.mean(self.queue_length_per_step)])
+            t.add_row(['Average Travel Time', np.mean([veh['travel_time'] for _, veh in self.vehicle_tracker.items()])])
+            t.add_row(['Average Speed', np.mean([veh['average_speed'] for _, veh in self.vehicle_tracker.items()])])  
+            print(t)
+
             return True
         return False
 
