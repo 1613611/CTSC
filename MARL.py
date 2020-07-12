@@ -1,165 +1,216 @@
-import argparse
-import time
-import logging as log
 import numpy as np
-import magent
-from magent.builtin.tf_model import DeepQNetwork
+import tensorflow as tf
+from keras.models import Sequential
+from keras.layers import Dense, Activation, Flatten
+from keras.optimizers import Adam
+
+from rl.agents.dqn import DQNAgent
+from rl.policy import BoltzmannQPolicy
+from rl.memory import SequentialMemory
+from SumoEnvironment import Environment
+from collections import deque
+from Memory import Memory
+import random
+import argparse
+from prettytable import PrettyTable
+import os
+ACTION_SPACE = 2
+STATE_SPACE = 2
+
+parser = argparse.ArgumentParser() 
+parser.add_argument("--gui", action='store_true', help = "Enable gui")
+parser.add_argument('--test-site', type=str, dest="net_file", help='Name of the net file')
+parser.add_argument("--light-traffic", action='store_true', dest="light_traffic", default=False, help = "Use workload of light traffic") 
+parser.add_argument("--heavy-traffic", action='store_true', dest="heavy_traffic", default=False, help = "Use workload of heavy traffic")
+parser.add_argument('--step-size', type=int, dest="step_size", default=5, help='Value of the step size')
+parser.add_argument('--number-episodes-train', type=int, dest="n_episodes", default=1000)
+parser.add_argument('--number-episodes-pretrain', type=int, dest="n_episodes_pretrain", default=5)
+parser.add_argument('--random-seed', type=int, dest="random_seed", default=42)
+parser.add_argument('--memory-length', type=int, dest="memory_length", default=4192)
+parser.add_argument('--batch-size', type=int, dest="batch_size", default=512)
+parser.add_argument('--epsilon', type=float, dest="epsilon", default=0.05)
+parser.add_argument('--update-interval', type=int, dest="update_interval", default=300)
+parser.add_argument('--epochs', type=int, dest="epochs", default=50)
+parser.add_argument('--gamma', type=float, dest="gamma", default=0.95)
+parser.add_argument('--max-step', type=int, dest="max_step", default=7200)
+
+args = parser.parse_args()
+
+# set RANDOM SEED
+RANDOM_SEED = args.random_seed
+np.random.seed(RANDOM_SEED)
+random.seed(RANDOM_SEED)
+os.environ['PYTHONHASHSEED']=str(RANDOM_SEED)
+tf.random.set_random_seed(RANDOM_SEED)
+
+N_EPISODES_TRAIN = args.n_episodes
+N_EPISODES_PRETRAIN = args.n_episodes_pretrain
+MEMORY_SIZE = args.memory_length
+BATCH_SIZE = args.batch_size
+EPSILON = args.epsilon
+UPDATE_INTERVAL = int(args.update_interval / args.step_size)
+EPOCHS = args.epochs
+GAMMA = args.gamma
+
+# Creat the environment 
+env = Environment(args)
+
+if args.net_file == '4-arterial-intersections':
+    agent_names = ['node1', 'node2', 'node3', 'node4']
+    
+if args.heavy_traffic:
+    LOG_QUEUE_LENGTH_FILE_NAME = './log/MARL/%s/queue-length-heavy-traffic' % args.net_file
+    LOG_VEHICLE_FILE_NAME = './log/MARL/%s/vehicle-heavy-traffic' % args.net_file
+elif args.light_traffic:
+    LOG_QUEUE_LENGTH_FILE_NAME = './log/MARL/%s/queue-length-light-traffic' % args.net_file
+    LOG_VEHICLE_FILE_NAME = './log/MARL/%s/vehicle-light-traffic' % args.net_file
 
 
-def play_a_round(env, map_size, handles, models, print_every, train=True, render=False, eps=None):
+# Create multi models, memories of agents
+memories = dict()
+models = dict()
+for agent in agent_names:
+    models[agent] = Sequential()
+    models[agent].add(Dense(8, input_dim=STATE_SPACE))
+    models[agent].add(Activation('relu'))
+    models[agent].add(Dense(16))
+    models[agent].add(Activation('relu'))
+    models[agent].add(Dense(16))
+    models[agent].add(Activation('relu'))
+    models[agent].add(Dense(ACTION_SPACE))
+    models[agent].add(Activation('linear'))
+    models[agent].compile(loss='mean_squared_error', optimizer='adam')
+    # models[agent].summary()
+
+    memories[agent] = Memory(MEMORY_SIZE)
+
+for _ in range(N_EPISODES_PRETRAIN):
     env.reset()
+    while True:
+        states = dict()
+        actions = dict()
+        rewards = dict()
+        next_states = dict()
 
-    env.add_walls(method="random", n=map_size * map_size * 0.03)
-    env.add_agents(handles[0], method="random", n=map_size * map_size * 0.0125)
-    env.add_agents(handles[1], method="random", n=map_size * map_size * 0.025)
+        step_action = []
+        for agent in agent_names:
+            states[agent] = env.get_observation(agent)
+            action = random.randint(0, 1)
+            actions[agent] = action
+        rewards, next_states, is_finished = env.set_action(actions)
 
-    step_ct = 0
-    done = False
-
-    n = len(handles)
-    obs  = [[] for _ in range(n)]
-    ids  = [[] for _ in range(n)]
-    acts = [[] for _ in range(n)]
-    nums = [env.get_num(handle) for handle in handles]
-    total_reward = [0 for _ in range(n)]
-
-    print("===== sample =====")
-    print("eps %s number %s" % (eps, nums))
-    start_time = time.time()
-    while not done:
-        # take actions for every model
-        for i in range(n):
-            obs[i] = env.get_observation(handles[i])
-            ids[i] = env.get_agent_id(handles[i])
-            # let models infer action in parallel (non-blocking)
-            models[i].infer_action(obs[i], ids[i], 'e_greedy', eps, block=False)
-        for i in range(n):
-            acts[i] = models[i].fetch_action()  # fetch actions (blocking)
-            env.set_action(handles[i], acts[i])
-
-        # simulate one step
-        done = env.step()
-
-        # sample
-        step_reward = []
-        for i in range(n):
-            rewards = env.get_reward(handles[i])
-            if train:
-                alives  = env.get_alive(handles[i])
-                # store samples in replay buffer (non-blocking)
-                models[i].sample_step(rewards, alives, block=False)
-            s = sum(rewards)
-            step_reward.append(s)
-            total_reward[i] += s
-
-        # render
-        if render:
-            env.render()
-
-        # clear dead agents
-        env.clear_dead()
-
-        # check 'done' returned by 'sample' command
-        if train:
-            for model in models:
-                model.check_done()
-
-        if step_ct % print_every == 0:
-            print("step %3d,  reward: %s,  total_reward: %s " %
-                  (step_ct, np.around(step_reward, 2), np.around(total_reward, 2)))
-        step_ct += 1
-        if step_ct > 250:
+        for agent in agent_names:
+            memories[agent].add([states[agent], actions[agent], rewards[agent], next_states[agent], is_finished])
+        if is_finished:
             break
 
-    sample_time = time.time() - start_time
-    print("steps: %d,  total time: %.2f,  step average %.2f" % (step_ct, sample_time, sample_time / step_ct))
+# function to update Q learning
+def update_model():
+    for agent in agent_names:
+        minibatch =  memories[agent].sample(BATCH_SIZE)
+        batch_states = []
+        batch_targets = []
+        for state, action, reward, next_state, done in minibatch:
+            batch_states.append(state)
+            target = reward
+            if not done:
+                qs = models[agent].predict(np.reshape([next_state], [1, STATE_SPACE]))
+                target = (reward +  GAMMA * np.amax(qs[0]))
+            target_f = models[agent].predict(np.reshape([state], [1, STATE_SPACE]))
+            target_f[0][action] = target
+            batch_targets.append(target_f[0])
+        models[agent].fit(np.array(batch_states), np.array(batch_targets), epochs=EPOCHS, shuffle=False, verbose=0, validation_split=0.3)
 
-    # train
-    total_loss, value = [0 for _ in range(n)], [0 for _ in range(n)]
-    if train:
-        print("===== train =====")
-        start_time = time.time()
+# train
+for epi in range(N_EPISODES_TRAIN):
+    env.reset()
+    count_interval = UPDATE_INTERVAL
+    while True:
+        states = dict()
+        actions = dict()
+        rewards = dict()
+        next_states = dict()
 
-        # train models in parallel
-        for i in range(n):
-            models[i].train(print_every=2000, block=False)
-        for i in range(n):
-            total_loss[i], value[i] = models[i].fetch_train()
+        step_action = []
+        for agent in agent_names:
+            states[agent] = env.get_observation(agent)
+            if np.random.rand() <= EPSILON:
+                action = random.randint(0, 1)
+            else:
+                state = np.reshape([states[agent]], [1, STATE_SPACE])
+                q_values = models[agent].predict(state)
+                action = np.argmax(q_values)
+            actions[agent] = action
+        rewards, next_states, is_finished = env.set_action(actions)
 
-        train_time = time.time() - start_time
-        print("train_time %.2f" % train_time)
+        for agent in agent_names:
+            memories[agent].add([states[agent], actions[agent], rewards[agent], next_states[agent], is_finished])
+        if is_finished:
+            break
 
-    return magent.round(total_loss), magent.round(total_reward), magent.round(value)
+        # count interval to update
+        count_interval -= 1
+        if count_interval <= 0:
+            count_interval = UPDATE_INTERVAL
+            update_model()
+
+    #finish => update
+    update_model()
+    
+    # Log to visualize
+    log_QL, log_Veh = env.get_log()
+    log_QL_address = LOG_QUEUE_LENGTH_FILE_NAME + '/%d.txt' % epi
+    os.makedirs(os.path.dirname(log_QL_address), exist_ok=True)
+    log_QL_file = open(log_QL_address, "w")
+    if args.net_file == '4-arterial-intersections':
+        log_QL_file.write('STEP,W11,W12,N11,N12,E11,E12,S11,S12,W21,W22,N21,N22,E21,E22,S21,S22,W31,W32,N31,N32,E31,E32,S31,S32,W41,W42,N41,N42,E41,E42,S41,S42\n')
+    for idx, q_length in enumerate(log_QL):
+        str_q_length = str(idx)
+        for q in q_length:
+            str_q_length += ',%d' % q
+        log_QL_file.write(str_q_length + '\n')
+
+    log_Veh_address = LOG_VEHICLE_FILE_NAME + '/%d.txt' % epi
+    os.makedirs(os.path.dirname(log_Veh_address), exist_ok=True)
+    log_Veh_file = open(log_Veh_address, "w")
+    log_Veh_file.write('VehID,DepartedTime,ArrivedTime,RouteID,TravelTime,AverageSpeed\n')            
+
+    for vehicleId in log_Veh.keys():
+        log_Veh_file.write('%s,%f,%f,%s,%f,%f\n' % (vehicleId,  log_Veh[vehicleId]['departed'],\
+                                                                log_Veh[vehicleId]['arrived'],\
+                                                                log_Veh[vehicleId]['routeID'],\
+                                                                log_Veh[vehicleId]['travel_time'],\
+                                                                log_Veh[vehicleId]['average_speed']))
+
+    t = PrettyTable(['Feature', 'Value'])
+    t.add_row(['Episode', epi])
+    t.add_row(['Average Queue Length', np.mean(log_QL)])
+    t.add_row(['Average Travel Time', np.mean([veh['travel_time'] for _, veh in log_Veh.items()])])
+    t.add_row(['Average Speed', np.mean([veh['average_speed'] for _, veh in log_Veh.items()])])  
+    print(t)
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--save_every", type=int, default=2)
-    parser.add_argument("--render_every", type=int, default=10)
-    parser.add_argument("--n_round", type=int, default=500)
-    parser.add_argument("--render", action="store_true")
-    parser.add_argument("--load_from", type=int)
-    parser.add_argument("--train", action="store_true")
-    parser.add_argument("--map_size", type=int, default=1000)
-    parser.add_argument("--greedy", action="store_true")
-    parser.add_argument("--eval", action="store_true")
-    parser.add_argument("--name", type=str, default="pursuit")
-    args = parser.parse_args()
+    for agent in agent_names:
+        if args.heavy_traffic:
+            name_file = "./model/%s/heavy-traffic/%s.h5" % (args.net_file, agent)
+        elif args.light_traffic:
+            name_file = "model/%s/light-traffic/%s.h5" % (args.net_file, agent)
+        os.makedirs(os.path.dirname(name_file), exist_ok=True)
+        models[agent].save_weights(name_file)
 
-    # set logger
-    magent.utility.init_logger(args.name)
+# memory = SequentialMemory(limit=50000, window_length=1)
+# policy = BoltzmannQPolicy()
+# dqn = DQNAgent(model=model, nb_actions=nb_actions, memory=memory, nb_steps_warmup=10,
+#                target_model_update=1e-2, policy=policy)
+# dqn.compile(Adam(lr=1e-3), metrics=['mae'])
 
-    # init the game
-    env = magent.GridWorld("pursuit", map_size=args.map_size)
-    env.set_render_dir("build/render")
+# # Okay, now it's time to learn something! We visualize the training here for show, but this
+# # slows down training quite a lot. You can always safely abort the training prematurely using
+# # Ctrl + C.
+# dqn.fit(env, nb_steps=50000, visualize=True, verbose=2)
 
-    # two groups of agents
-    handles = env.get_handles()
+# # After training is done, we save the final weights.
+# dqn.save_weights('dqn_{}_weights.h5f'.format(args.net_file), overwrite=True)
 
-    # load models
-    names = ["predator", "prey"]
-    models = []
-
-    for i in range(len(names)):
-        models.append(magent.ProcessingModel(
-            env, handles[i], names[i], 20000+i, 4000, DeepQNetwork,
-            batch_size=512, memory_size=2 ** 22,
-            target_update=1000, train_freq=4
-        ))
-
-    # load if
-    savedir = 'save_model'
-    if args.load_from is not None:
-        start_from = args.load_from
-        print("load ... %d" % start_from)
-        for model in models:
-            model.load(savedir, start_from)
-    else:
-        start_from = 0
-
-    # print debug info
-    print(args)
-    print("view_space", env.get_view_space(handles[0]))
-    print("feature_space", env.get_feature_space(handles[0]))
-
-    # play
-    start = time.time()
-    for k in range(start_from, start_from + args.n_round):
-        tic = time.time()
-        eps = magent.utility.piecewise_decay(k, [0, 200, 400], [1, 0.2, 0.05]) if not args.greedy else 0
-
-        loss, reward, value = play_a_round(env, args.map_size, handles, models,
-                                           print_every=50, train=args.train,
-                                           render=args.render or (k+1) % args.render_every == 0,
-                                           eps=eps)  # for e-greedy
-        log.info("round %d\t loss: %s\t reward: %s\t value: %s" % (k, loss, reward, value))
-        print("round time %.2f  total time %.2f\n" % (time.time() - tic, time.time() - start))
-
-        if (k + 1) % args.save_every == 0 and args.train:
-            print("save model... ")
-            for model in models:
-                model.save(savedir, k)
-
-    # send quit command
-    for model in models:
-        model.quit()
+# # Finally, evaluate our algorithm for 5 episodes.
+# dqn.test(env, nb_episodes=5, visualize=True)
