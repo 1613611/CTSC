@@ -5,9 +5,6 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation, Flatten
 from keras.optimizers import Adam
 
-from rl.agents.dqn import DQNAgent
-from rl.policy import BoltzmannQPolicy
-from rl.memory import SequentialMemory
 from SumoEnvironment import Environment
 from collections import deque
 from Memory import Memory
@@ -63,11 +60,11 @@ if args.net_file == '4-arterial-intersections':
     agent_names = ['node1', 'node2', 'node3', 'node4']
     N_AGENTS = 4
 if args.heavy_traffic:
-    LOG_QUEUE_LENGTH_FILE_NAME = './log/MARL/%s/queue-length-heavy-traffic' % args.net_file
-    LOG_VEHICLE_FILE_NAME = './log/MARL/%s/vehicle-heavy-traffic' % args.net_file
+    LOG_QUEUE_LENGTH_FILE_NAME = './log/CentralizedRL/%s/queue-length-heavy-traffic' % args.net_file
+    LOG_VEHICLE_FILE_NAME = './log/CentralizedRL/%s/vehicle-heavy-traffic' % args.net_file
 elif args.light_traffic:
-    LOG_QUEUE_LENGTH_FILE_NAME = './log/MARL/%s/queue-length-light-traffic' % args.net_file
-    LOG_VEHICLE_FILE_NAME = './log/MARL/%s/vehicle-light-traffic' % args.net_file
+    LOG_QUEUE_LENGTH_FILE_NAME = './log/CentralizedRL/%s/queue-length-light-traffic' % args.net_file
+    LOG_VEHICLE_FILE_NAME = './log/CentralizedRL/%s/vehicle-light-traffic' % args.net_file
 
 
 # Create multi models, memories of agents
@@ -129,8 +126,6 @@ for _ in range(N_EPISODES_PRETRAIN):
         rewards, next_states, is_finished = env.set_action(actions)
 
         memory.add([states, actions, rewards, next_states, is_finished])
-        # for agent in agent_names:
-        #     memories[agent].add([states[agent], actions[agent], rewards[agent], next_states[agent], is_finished])
         if is_finished:
             break
 
@@ -147,29 +142,24 @@ def update_model():
         np_next_states = []
         for agent in agent_names:
             np_states.extend(states[agent])
-            np_actions.extend(actions[agent])
-            np_rewards.extend(rewards[agent])
+            np_actions.append(actions[agent])
+            np_rewards.append(rewards[agent])
             np_next_states.extend(next_states[agent])
 
         target = np_rewards
-        # if not done:
-        #     qs = models[agent].predict(np.reshape([next_state], [1, STATE_SPACE]))
+        if not done:
+            qs = model.predict(np.reshape([np_next_states], [1, STATE_SPACE*N_AGENTS]))
+            for idx,_ in enumerate(np_actions):
+                target[idx] = (np_rewards[idx] +  GAMMA * np.amax(qs[0][idx*2:idx*2+2]))
 
+        target_f = model.predict(np.reshape([np_states], [1, STATE_SPACE*N_AGENTS]))
+        for idx, action in enumerate(np_actions):
+            target_f[0][idx*2 + action] = target[idx]
+        
+        batch_targets.append(target_f[0])
+        batch_states.append(np_states)
+    model.fit(np.array(batch_states), np.array(batch_targets), epochs=EPOCHS, shuffle=False, verbose=0, validation_split=0.3)
 
-    for agent in agent_names:
-        minibatch =  memories[agent].sample(BATCH_SIZE)
-        batch_states = []
-        batch_targets = []
-        for state, action, reward, next_state, done in minibatch:
-            batch_states.append(state)
-            target = reward
-            if not done:
-                qs = models[agent].predict(np.reshape([next_state], [1, STATE_SPACE]))
-                target = (reward +  GAMMA * np.amax(qs[0]))
-            target_f = models[agent].predict(np.reshape([state], [1, STATE_SPACE]))
-            target_f[0][action] = target
-            batch_targets.append(target_f[0])
-        models[agent].fit(np.array(batch_states), np.array(batch_targets), epochs=EPOCHS, shuffle=False, verbose=0, validation_split=0.3)
 
 # train
 for epi in range(N_EPISODES_TRAIN):
@@ -182,19 +172,22 @@ for epi in range(N_EPISODES_TRAIN):
         next_states = dict()
 
         step_action = []
+        
+        np_state = []
         for agent in agent_names:
             states[agent] = env.get_observation(agent)
-            if np.random.rand() <= EPSILON:
-                action = random.randint(0, 1)
-            else:
-                state = np.reshape([states[agent]], [1, STATE_SPACE])
-                q_values = models[agent].predict(state)
-                action = np.argmax(q_values)
-            actions[agent] = action
+            np_state.extend(states[agent])
+        
+        if np.random.rand() <= EPSILON:
+            for agent in agent_names:
+                actions[agent] = random.randint(0, 1)
+        else:
+            q_values = model.predict(np.reshape([np_state], [1, STATE_SPACE*N_AGENTS]))
+            for idx, agent in enumerate(agent_names):
+                actions[agent] = np.argmax(q_values[0][idx*2:idx*2+2])                
         rewards, next_states, is_finished = env.set_action(actions)
 
-        for agent in agent_names:
-            memories[agent].add([states[agent], actions[agent], rewards[agent], next_states[agent], is_finished])
+        memory.add([states, actions, rewards, next_states, is_finished])
         if is_finished:
             break
 
@@ -240,27 +233,10 @@ for epi in range(N_EPISODES_TRAIN):
     print(t)
 
     if args.train == True:
-        for agent in agent_names:
-            if args.heavy_traffic:
-                name_file = "./model/%s/heavy-traffic/%s.h5" % (args.net_file, agent)
-            elif args.light_traffic:
-                name_file = "model/%s/light-traffic/%s.h5" % (args.net_file, agent)
-            os.makedirs(os.path.dirname(name_file), exist_ok=True)
-            models[agent].save_weights(name_file)
+        if args.heavy_traffic:
+            name_file = "./model/Centralized/%s/heavy-traffic/%s.h5" % (args.net_file, agent)
+        elif args.light_traffic:
+            name_file = "model/Centralized/%s/light-traffic/%s.h5" % (args.net_file, agent)
+        os.makedirs(os.path.dirname(name_file), exist_ok=True)
+        model.save_weights(name_file)
 
-# memory = SequentialMemory(limit=50000, window_length=1)
-# policy = BoltzmannQPolicy()
-# dqn = DQNAgent(model=model, nb_actions=nb_actions, memory=memory, nb_steps_warmup=10,
-#                target_model_update=1e-2, policy=policy)
-# dqn.compile(Adam(lr=1e-3), metrics=['mae'])
-
-# # Okay, now it's time to learn something! We visualize the training here for show, but this
-# # slows down training quite a lot. You can always safely abort the training prematurely using
-# # Ctrl + C.
-# dqn.fit(env, nb_steps=50000, visualize=True, verbose=2)
-
-# # After training is done, we save the final weights.
-# dqn.save_weights('dqn_{}_weights.h5f'.format(args.net_file), overwrite=True)
-
-# # Finally, evaluate our algorithm for 5 episodes.
-# dqn.test(env, nb_episodes=5, visualize=True)

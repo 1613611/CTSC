@@ -5,9 +5,6 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation, Flatten
 from keras.optimizers import Adam
 
-from rl.agents.dqn import DQNAgent
-from rl.policy import BoltzmannQPolicy
-from rl.memory import SequentialMemory
 from SumoEnvironment import Environment
 from collections import deque
 from Memory import Memory
@@ -16,7 +13,7 @@ import argparse
 from prettytable import PrettyTable
 import os
 ACTION_SPACE = 2
-STATE_SPACE = 2
+STATE_SPACE = 4
 
 parser = argparse.ArgumentParser() 
 parser.add_argument("--gui", action='store_true', default=False, help = "Enable gui")
@@ -171,6 +168,7 @@ for epi in range(N_EPISODES_TRAIN):
                 state = np.reshape([states[agent]], [1, STATE_SPACE])
                 q_values = models[agent].predict(state)
                 action = np.argmax(q_values)
+                print(action)
             actions[agent] = action
         rewards, next_states, is_finished = env.set_action(actions)
 
