@@ -34,17 +34,21 @@ if args.net_file == '4-arterial-intersections':
                             '2to3_1', 'NtoC_3_1', '4to3_1', 'StoC_3_1', '3to4_1', 'NtoC_4_1', '5to4_1', 'StoC_4_1']
     DISTANCE_OF_ROUTE = {"route1": 830, "route2": 830, "route1A": 320, "route1B": 320, "route2A": 320, "route2B": 320, \
                          "route3A": 320, "route3B": 320, "route4A": 320, "route4B": 320}    
+    TRAFFIC_SIGNAL_LIGHT_NAMES = ['node1', 'node2', 'node3', 'node4']
+    MOVEMENT_DISTANCE = [150*5 + 4*20, 150*2 + 20]
+
 if args.heavy_traffic:
     sumoCmd.extend(['-r', './network/%s.heavy.route.xml' % args.net_file])
-    LOG_QUEUE_LENGTH_FILE_NAME = './log/FT-queue-length-%s-heavy-traffic.txt' % args.net_file
-    LOG_VEHICLE_FILE_NAME = './log/FT-vehicle-%s-heavy-traffic.txt' % args.net_file
+    LOG_QUEUE_LENGTH_FILE_NAME = './log/%s/heavy-traffic/FT/queue-length.txt' % args.net_file
+    LOG_VEHICLE_FILE_NAME = './log/%s/heavy-traffic/FT/vehicle.txt' % args.net_file
+    LOG_TRAFFIC_LIGHT_FILE_NAME = './log/%s/heavy-traffic/FT/traffic-light.txt' % args.net_file
 elif args.light_traffic:
     sumoCmd.extend(['-r', './network/%s.light.route.xml' % args.net_file])
-    LOG_QUEUE_LENGTH_FILE_NAME = './log/FT-queue-length-%s-light-traffic.txt' % args.net_file
-    LOG_VEHICLE_FILE_NAME = './log/FT-vehicle-%s-light-traffic.txt' % args.net_file
+    LOG_QUEUE_LENGTH_FILE_NAME = './log/%s/light-traffic/FT/queue-length.txt' % args.net_file
+    LOG_VEHICLE_FILE_NAME = './log/%s/light-traffic/FT/vehicle.txt' % args.net_file
+    LOG_TRAFFIC_LIGHT_FILE_NAME = './log/%s/light-traffic/FT/traffic-light.txt' % args.net_file
 
-TRAFFIC_SIGNAL_LIGHT_NAMES = ['node1', 'node2', 'node3', 'node4']
-MOVEMENT_DISTANCE = [150*5 + 4*20, 150*2 + 20]
+
 
 
 
@@ -53,13 +57,21 @@ class Simulation_FT():
         traci.start(sumoCmd)
         self.current_phase_duration = 0
         self.queue_length_per_step = []
+
+        os.makedirs(os.path.dirname(LOG_TRAFFIC_LIGHT_FILE_NAME), exist_ok=True)
+        self.log_traffic_light = open(LOG_TRAFFIC_LIGHT_FILE_NAME, "w")
+
+        os.makedirs(os.path.dirname(LOG_QUEUE_LENGTH_FILE_NAME), exist_ok=True)
         self.log_QL_file = open(LOG_QUEUE_LENGTH_FILE_NAME, "w")
         if args.net_file == '4-arterial-intersections':
             self.log_QL_file.write('STEP,W11,W12,N11,N12,E11,E12,S11,S12,W21,W22,N21,N22,E21,E22,S21,S22,W31,W32,N31,N32,E31,E32,S31,S32,W41,W42,N41,N42,E41,E42,S41,S42\n')
+            self.log_traffic_light.write('step,node1,node2,node3,node4\n')
 
+        os.makedirs(os.path.dirname(LOG_VEHICLE_FILE_NAME), exist_ok=True)
         self.log_Veh_file = open(LOG_VEHICLE_FILE_NAME, "w")
         self.log_Veh_file.write('VehID,DepartedTime,ArrivedTime,RouteID,TravelTime,AverageSpeed\n')            
         self.vehicle_tracker = dict()
+
 
     def nextStep(self):
         self.log_step()
@@ -92,6 +104,13 @@ class Simulation_FT():
                                                                         self.vehicle_tracker[vehicleId]['routeID'],\
                                                                         self.vehicle_tracker[vehicleId]['travel_time'],\
                                                                         self.vehicle_tracker[vehicleId]['average_speed']))
+
+        # LOG TRAFFIC LIGHT
+        s = str(step)
+        for tls in TRAFFIC_SIGNAL_LIGHT_NAMES:
+            s += ',%d' % traci.trafficlight.getPhase(tls)
+        self.log_traffic_light.write(s + '\n')
+
     def changePhase(self):
         self.current_phase_duration = 0
         currentPhase = traci.trafficlight.getPhase(TRAFFIC_SIGNAL_LIGHT_NAMES[0])

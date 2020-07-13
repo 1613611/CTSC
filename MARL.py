@@ -60,9 +60,12 @@ if args.net_file == '4-arterial-intersections':
 if args.heavy_traffic:
     LOG_QUEUE_LENGTH_FILE_NAME = './log/MARL/%s/queue-length-heavy-traffic' % args.net_file
     LOG_VEHICLE_FILE_NAME = './log/MARL/%s/vehicle-heavy-traffic' % args.net_file
+    LOG_TRAFFIC_LIGHT_FILE_NAME = './log/%s/heavy-traffic/MARL/traffic-light.txt' % args.net_file
+
 elif args.light_traffic:
     LOG_QUEUE_LENGTH_FILE_NAME = './log/MARL/%s/queue-length-light-traffic' % args.net_file
     LOG_VEHICLE_FILE_NAME = './log/MARL/%s/vehicle-light-traffic' % args.net_file
+    LOG_TRAFFIC_LIGHT_FILE_NAME = './log/%s/light-traffic/MARL/traffic-light.txt' % args.net_file
 
 
 # Create multi models, memories of agents
@@ -70,11 +73,11 @@ memories = dict()
 models = dict()
 for agent in agent_names:
     models[agent] = Sequential()
-    models[agent].add(Dense(8, input_dim=STATE_SPACE))
+    models[agent].add(Dense(32, input_dim=STATE_SPACE))
     models[agent].add(Activation('relu'))
-    models[agent].add(Dense(16))
+    models[agent].add(Dense(64))
     models[agent].add(Activation('relu'))
-    models[agent].add(Dense(16))
+    models[agent].add(Dense(64))
     models[agent].add(Activation('relu'))
     models[agent].add(Dense(ACTION_SPACE))
     models[agent].add(Activation('linear'))
@@ -101,13 +104,20 @@ if args.trial:
         _, _, is_finished = env.set_action(actions)
         if is_finished:
             break
-    log_QL, log_Veh = env.get_log()
+    log_QL, log_Veh, tls_log = env.get_log()
     t = PrettyTable(['Feature', 'Value'])
     t.add_row(['Average Queue Length', np.mean(log_QL)])
     t.add_row(['Average Travel Time', np.mean([veh['travel_time'] for _, veh in log_Veh.items()])])
     t.add_row(['Average Speed', np.mean([veh['average_speed'] for _, veh in log_Veh.items()])])  
     print(t)
 
+    os.makedirs(os.path.dirname(LOG_TRAFFIC_LIGHT_FILE_NAME), exist_ok=True)
+    log_tls_file = open(LOG_TRAFFIC_LIGHT_FILE_NAME, "w")
+    log_tls_file.write('step,node1,node2,node3,node4\n')
+    for idx, log in enumerate(tls_log):
+        log_tls_file.write('%d' % idx)
+        [log_tls_file.write(',%d' % val) for val in log]
+        log_tls_file.write('\n')
     sys.exit(0)
 
     
@@ -186,7 +196,7 @@ for epi in range(N_EPISODES_TRAIN):
     update_model()
     
     # Log to visualize
-    log_QL, log_Veh = env.get_log()
+    log_QL, log_Veh, _ = env.get_log()
     log_QL_address = LOG_QUEUE_LENGTH_FILE_NAME + '/%d.txt' % epi
     os.makedirs(os.path.dirname(log_QL_address), exist_ok=True)
     log_QL_file = open(log_QL_address, "w")

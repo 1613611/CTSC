@@ -50,10 +50,11 @@ class Environment():
     def reset(self):
         self.queue_length_per_step = []
         self.vehicle_tracker = dict()
+        self.traffic_light_log = []
         traci.start(self.sumoCmd)
 
     def get_log(self):
-        return self.queue_length_per_step, self.vehicle_tracker
+        return self.queue_length_per_step, self.vehicle_tracker, self.traffic_light_log
 
     def get_observation(self, agent):
         currentPhase = traci.trafficlight.getPhase(agent)
@@ -126,6 +127,12 @@ class Environment():
             self.vehicle_tracker[vehicleId]['arrived'] = step
             self.vehicle_tracker[vehicleId]['travel_time'] = self.vehicle_tracker[vehicleId]['arrived'] - self.vehicle_tracker[vehicleId]['departed']
             self.vehicle_tracker[vehicleId]['average_speed'] = DISTANCE_OF_ROUTE[self.vehicle_tracker[vehicleId]['routeID']]/self.vehicle_tracker[vehicleId]['travel_time']
+
+        tls_log = []
+        for tls in self.intersecions:
+            tls_log.append(traci.trafficlight.getPhase(tls))
+        self.traffic_light_log.append(tls_log)
+
 
     def change_phase(self, intersection):
         cur_phase = traci.trafficlight.getPhase(intersection)

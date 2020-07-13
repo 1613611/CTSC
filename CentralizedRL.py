@@ -15,7 +15,7 @@ import os
 
 ACTION_SPACE = 2
 STATE_SPACE = 4
-N_AGENTS = 0
+N_AGENTS = 4
 
 parser = argparse.ArgumentParser() 
 parser.add_argument("--gui", action='store_true', default=False, help = "Enable gui")
@@ -60,17 +60,21 @@ if args.net_file == '4-arterial-intersections':
     agent_names = ['node1', 'node2', 'node3', 'node4']
     N_AGENTS = 4
 if args.heavy_traffic:
-    LOG_QUEUE_LENGTH_FILE_NAME = './log/CentralizedRL/%s/queue-length-heavy-traffic' % args.net_file
-    LOG_VEHICLE_FILE_NAME = './log/CentralizedRL/%s/vehicle-heavy-traffic' % args.net_file
-elif args.light_traffic:
-    LOG_QUEUE_LENGTH_FILE_NAME = './log/CentralizedRL/%s/queue-length-light-traffic' % args.net_file
-    LOG_VEHICLE_FILE_NAME = './log/CentralizedRL/%s/vehicle-light-traffic' % args.net_file
+    LOG_QUEUE_LENGTH_FILE_NAME = './log/%s/heavy-traffic/CentralizedRL/queue-length' % args.net_file
+    LOG_VEHICLE_FILE_NAME = './log/%s/heavy-traffic/CentralizedRL/vehicle' % args.net_file
 
+    LOG_TRAFFIC_LIGHT_FILE_NAME = './log/%s/heavy-traffic/CentralizedRL/traffic-light.txt' % args.net_file
+
+elif args.light_traffic:
+    LOG_QUEUE_LENGTH_FILE_NAME = './log/%s/light-traffic/CentralizedRL/queue-length' % args.net_file
+    LOG_VEHICLE_FILE_NAME = './log/%s/light-traffic/CentralizedRL/vehicle' % args.net_file
+
+    LOG_TRAFFIC_LIGHT_FILE_NAME = './log/%s/light-traffic/CentralizedRL/traffic-light.txt' % args.net_file
 
 # Create multi models, memories of agents
 
 model = Sequential()
-model.add(Dense(16, input_dim=STATE_SPACE*N_AGENTS))
+model.add(Dense(32, input_dim=STATE_SPACE*N_AGENTS))
 model.add(Activation('relu'))
 model.add(Dense(64))
 model.add(Activation('relu'))
@@ -108,12 +112,20 @@ if args.trial:
         rewards, next_states, is_finished = env.set_action(actions)
         if is_finished:
             break
-    log_QL, log_Veh = env.get_log()
+    log_QL, log_Veh, tls_log = env.get_log()
     t = PrettyTable(['Feature', 'Value'])
     t.add_row(['Average Queue Length', np.mean(log_QL)])
     t.add_row(['Average Travel Time', np.mean([veh['travel_time'] for _, veh in log_Veh.items()])])
     t.add_row(['Average Speed', np.mean([veh['average_speed'] for _, veh in log_Veh.items()])])  
     print(t)
+
+    os.makedirs(os.path.dirname(LOG_TRAFFIC_LIGHT_FILE_NAME), exist_ok=True)
+    log_tls_file = open(LOG_TRAFFIC_LIGHT_FILE_NAME, "w")
+    log_tls_file.write('step,node1,node2,node3,node4\n')
+    for idx, log in enumerate(tls_log):
+        log_tls_file.write('%d' % idx)
+        [log_tls_file.write(',%d' % val) for val in log]
+        log_tls_file.write('\n')
     sys.exit(0)
 
     
@@ -209,7 +221,7 @@ for epi in range(N_EPISODES_TRAIN):
     update_model()
     
     # Log to visualize
-    log_QL, log_Veh = env.get_log()
+    log_QL, log_Veh, _ = env.get_log()
     log_QL_address = LOG_QUEUE_LENGTH_FILE_NAME + '/%d.txt' % epi
     os.makedirs(os.path.dirname(log_QL_address), exist_ok=True)
     log_QL_file = open(log_QL_address, "w")
