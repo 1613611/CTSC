@@ -1,14 +1,16 @@
 python FT.py --test-site 4-arterial-intersections --light-traffic
+
+#TO TRAIN
 python MARL.py  --test-site 4-arterial-intersections --step-size 5 --number-episodes-train 1000 \
                 --number-episodes-pretrain 5 --random-seed 42 --memory-length 4192 --batch-size 512 --epsilon 0.05 \
                 --update-interval 300 --epochs 50 --gamma 0.95 --max-step 7200 --light-traffic --train
 
-python MARL.py  --test-site 4-arterial-intersections --step-size 5 --number-episodes-train 1000 \
+# TO TRIAL
+python CentralizedRL.py  --test-site 4-arterial-intersections --step-size 5 --number-episodes-train 1000 \
                 --number-episodes-pretrain 5 --random-seed 42 --memory-length 4192 --batch-size 512 --epsilon 0.05 \
                 --update-interval 300 --epochs 50 --gamma 0.95 --max-step 7200 --light-traffic   --gui --trial
 
-python MARL.py --test-site 4-arterial-intersections --light-traffic --step-size 5 --number-episodes-train 1000 --number-episodes-pretrain 1 --random-seed 42 --memory-length 4192 --batch-size 1 --epsilon 0.05 --update-interval 300
-
+# TO TEST DURING DEVELOPING
 python CentralizedRL.py  --test-site 4-arterial-intersections --step-size 5 --number-episodes-train 1000 \
                 --number-episodes-pretrain 1 --random-seed 42 --memory-length 4192 --batch-size 8 --epsilon 0.05 \
                 --update-interval 300 --epochs 50 --gamma 0.95 --max-step 7200 --light-traffic

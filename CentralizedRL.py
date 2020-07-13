@@ -82,31 +82,39 @@ model.compile(loss='mean_squared_error', optimizer='adam')
 
 memory = Memory(MEMORY_SIZE)
 
-# if args.trial:
-#     for agent in agent_names:
-#         if args.heavy_traffic:
-#             name_file = "./model/%s/heavy-traffic/%s.h5" % (args.net_file, agent)
-#         elif args.light_traffic:
-#             name_file = "model/%s/light-traffic/%s.h5" % (args.net_file, agent)
-#         models[agent].load_weights(name_file)
-#     env.reset()
-#     while True:
-#         actions = dict()
-#         for agent in agent_names:
-#             state = env.get_observation(agent)
-#             q_values = models[agent].predict(np.reshape([state], [1, STATE_SPACE]))
-#             action = np.argmax(q_values)
-#             actions[agent] = action
-#         _, _, is_finished = env.set_action(actions)
-#         if is_finished:
-#             break
-#     log_QL, log_Veh = env.get_log()
-#     t = PrettyTable(['Feature', 'Value'])
-#     t.add_row(['Average Queue Length', np.mean(log_QL)])
-#     t.add_row(['Average Travel Time', np.mean([veh['travel_time'] for _, veh in log_Veh.items()])])
-#     t.add_row(['Average Speed', np.mean([veh['average_speed'] for _, veh in log_Veh.items()])])  
-#     print(t)
-#     sys.exit(0)
+if args.trial:
+    if args.heavy_traffic:
+        name_file = "./model/Centralized/%s/heavy-traffic/model.h5" % args.net_file
+    elif args.light_traffic:
+        name_file = "model/Centralized/%s/light-traffic/model.h5" % args.net_file
+    model.load_weights(name_file)
+    env.reset()
+
+    while True:
+        states = dict()
+        actions = dict()
+        rewards = dict()
+        next_states = dict()
+
+        step_action = []
+        
+        np_state = []
+        for agent in agent_names:
+            states[agent] = env.get_observation(agent)
+            np_state.extend(states[agent])        
+        q_values = model.predict(np.reshape([np_state], [1, STATE_SPACE*N_AGENTS]))
+        for idx, agent in enumerate(agent_names):
+            actions[agent] = np.argmax(q_values[0][idx*2:idx*2+2])                
+        rewards, next_states, is_finished = env.set_action(actions)
+        if is_finished:
+            break
+    log_QL, log_Veh = env.get_log()
+    t = PrettyTable(['Feature', 'Value'])
+    t.add_row(['Average Queue Length', np.mean(log_QL)])
+    t.add_row(['Average Travel Time', np.mean([veh['travel_time'] for _, veh in log_Veh.items()])])
+    t.add_row(['Average Speed', np.mean([veh['average_speed'] for _, veh in log_Veh.items()])])  
+    print(t)
+    sys.exit(0)
 
     
 
@@ -234,9 +242,9 @@ for epi in range(N_EPISODES_TRAIN):
 
     if args.train == True:
         if args.heavy_traffic:
-            name_file = "./model/Centralized/%s/heavy-traffic/%s.h5" % (args.net_file, agent)
+            name_file = "./model/Centralized/%s/heavy-traffic/model.h5" % args.net_file
         elif args.light_traffic:
-            name_file = "model/Centralized/%s/light-traffic/%s.h5" % (args.net_file, agent)
+            name_file = "model/Centralized/%s/light-traffic/model.h5" % args.net_file
         os.makedirs(os.path.dirname(name_file), exist_ok=True)
         model.save_weights(name_file)
 

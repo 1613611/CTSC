@@ -168,7 +168,6 @@ for epi in range(N_EPISODES_TRAIN):
                 state = np.reshape([states[agent]], [1, STATE_SPACE])
                 q_values = models[agent].predict(state)
                 action = np.argmax(q_values)
-                print(action)
             actions[agent] = action
         rewards, next_states, is_finished = env.set_action(actions)
 

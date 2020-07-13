@@ -11,7 +11,7 @@
     <route id="route4B" edges="NtoC_4 CtoS_4"/>
 
     <flow id="01" type="passenger" begin="0" end="3600" probability="0.2" route="route1"/>
-    <flow id="02" type="passenger" begin="0" end="3600" probability="0.2" route="route2"/>
+    <flow id="02" type="passenger" begin="0" end="3600" probability="0.05" route="route2"/>
     <flow id="03" type="passenger" begin="0" end="3600" probability="0.05" route="route1A"/>
     <flow id="04" type="passenger" begin="0" end="3600" probability="0.05" route="route1B"/>
     <flow id="05" type="passenger" begin="0" end="3600" probability="0.05" route="route2A"/>
