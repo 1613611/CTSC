@@ -58,21 +58,28 @@ class Environment():
     def get_observation(self, agent):
         currentPhase = traci.trafficlight.getPhase(agent)
         number_waiting_veh_on_coming_lanes_allowed = 0
+        number_veh_on_coming_lanes_allowed = 0
         number_waiting_veh_on_coming_lanes_disallowed = 0
+        number_veh_on_coming_lanes_disallowed = 0
         if currentPhase == 0:
             for lane in LIST_INCOMING_LANES[agent][0:4]:
                 number_waiting_veh_on_coming_lanes_allowed += traci.lane.getLastStepHaltingNumber(lane)
+                number_veh_on_coming_lanes_allowed += traci.lane.getLastStepVehicleNumber(lane)
             for lane in LIST_INCOMING_LANES[agent][4:]:
                 number_waiting_veh_on_coming_lanes_disallowed += traci.lane.getLastStepHaltingNumber(lane)
+                number_veh_on_coming_lanes_disallowed += traci.lane.getLastStepVehicleNumber(lane)
         elif currentPhase == 2:
             for lane in LIST_INCOMING_LANES[agent][0:4]:
                 number_waiting_veh_on_coming_lanes_disallowed += traci.lane.getLastStepHaltingNumber(lane)
+                number_veh_on_coming_lanes_disallowed += traci.lane.getLastStepVehicleNumber(lane)
             for lane in LIST_INCOMING_LANES[agent][4:]:
                 number_waiting_veh_on_coming_lanes_allowed += traci.lane.getLastStepHaltingNumber(lane)
+                number_veh_on_coming_lanes_allowed += traci.lane.getLastStepVehicleNumber(lane)
         else:
             print('error in get_observation')
-        return [number_waiting_veh_on_coming_lanes_allowed, number_waiting_veh_on_coming_lanes_disallowed]
-
+        return [number_waiting_veh_on_coming_lanes_allowed, number_veh_on_coming_lanes_allowed, \
+                number_waiting_veh_on_coming_lanes_disallowed, number_veh_on_coming_lanes_disallowed]
+    
     def get_reward(self, agent):
         reward = 0
         for lane in LIST_INCOMING_LANES[agent]:
