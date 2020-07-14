@@ -1,13 +1,7 @@
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
     <input>
-        <additional-files value="type.xml, tls.state.xml" />
+        <additional-files value="type.xml" />
     </input>
-    <additional>
-        <timedEvent type="SaveTLSStates" source="node1" dest="TLS.1.output.xml"/>
-        <timedEvent type="SaveTLSStates" source="node2" dest="TLS.2.output.xml"/>
-        <timedEvent type="SaveTLSStates" source="node3" dest="TLS.3.output.xml"/>
-        <timedEvent type="SaveTLSStates" source="node4" dest="TLS.4.output.xml"/>
-    </additional>
 
     <processing>
         <time-to-teleport value="-1" />
