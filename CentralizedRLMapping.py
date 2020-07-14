@@ -174,12 +174,13 @@ def update_model():
             np_next_states.extend(next_states[agent])
 
         target = np.sum(np_rewards)
+
+        action_bin = ''
+        for action in np_actions:
+            action_bin += str(action)
+        action_map = int(action_bin, 2)
         if not done:
             qs = model.predict(np.reshape([np_next_states], [1, STATE_SPACE*N_AGENTS]))
-            action_bin = ''
-            for action in np_actions:
-                action_bin += str(action)
-            action_map = int(action_bin, 2)
             target =  np.sum(np_rewards) + GAMMA * np.max(qs[0])
 
         target_f = model.predict(np.reshape([np_states], [1, STATE_SPACE*N_AGENTS]))
