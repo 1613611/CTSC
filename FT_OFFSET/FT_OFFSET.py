@@ -50,9 +50,9 @@ elif args.light_traffic:
 
 
 
-PHASE_1_LENGTH = 20
-PHASE_2_LENGTH = 10
-
+PHASE_1_LENGTH = 25
+PHASE_2_LENGTH = 5
+OFFSET = 15
 class Simulation_FT():
     def __init__(self):
         traci.start(sumoCmd)
@@ -112,25 +112,9 @@ class Simulation_FT():
             s += ',%d' % traci.trafficlight.getPhase(tls)
         self.log_traffic_light.write(s + '\n')
 
-    def changePhase(self):
-        self.current_phase_duration = 0
-        currentPhase = traci.trafficlight.getPhase(TRAFFIC_SIGNAL_LIGHT_NAMES[0])
-        if currentPhase == 0:
-            for name in TRAFFIC_SIGNAL_LIGHT_NAMES:
-                traci.trafficlight.setPhase(name, 1)
-            for _ in range(3):
-                self.nextStep()
-            for name in TRAFFIC_SIGNAL_LIGHT_NAMES:
-                traci.trafficlight.setPhase(name, 2)
-        elif currentPhase == 2:
-            for name in TRAFFIC_SIGNAL_LIGHT_NAMES:
-                traci.trafficlight.setPhase(name, 3)
-            for _ in range(3):
-                self.nextStep()
-            for name in TRAFFIC_SIGNAL_LIGHT_NAMES:
-                traci.trafficlight.setPhase(name, 0)
-        else:
-            print("error in change phase")
+    def initPhase(self):
+        for idx, name in enumerate(TRAFFIC_SIGNAL_LIGHT_NAMES):
+            traci.trafficlight.setPhaseDuration(name, PHASE_1_LENGTH + idx*OFFSET)
 
     def isFinised(self):
         if traci.simulation.getMinExpectedNumber() <= 0:
@@ -147,13 +131,9 @@ class Simulation_FT():
         return False
 
     def makeAction(self):
-        currentPhase = traci.trafficlight.getPhase(TRAFFIC_SIGNAL_LIGHT_NAMES[0])
-        if (currentPhase == 0 and self.current_phase_duration >= PHASE_1_LENGTH) or \
-            (currentPhase == 2 and self.current_phase_duration >= PHASE_2_LENGTH):
-            self.changePhase()
-        else:
-            self.nextStep()
+        self.nextStep()
 
 s = Simulation_FT()
+s.initPhase()
 while s.isFinised() != True:
     s.makeAction()

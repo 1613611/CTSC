@@ -1,0 +1,23 @@
+<routes>
+    <route id="route1" edges="0to1 1to2 2to3 3to4 4to5"/>
+    <route id="route2" edges="5to4 4to3 3to2 2to1 1to0"/>
+    <route id="route1A" edges="StoC_1 CtoN_1"/>
+    <route id="route1B" edges="NtoC_1 CtoS_1"/>
+    <route id="route2A" edges="StoC_2 CtoN_2"/>
+    <route id="route2B" edges="NtoC_2 CtoS_2"/>
+    <route id="route3A" edges="StoC_3 CtoN_3"/>
+    <route id="route3B" edges="NtoC_3 CtoS_3"/>
+    <route id="route4A" edges="StoC_4 CtoN_4"/>
+    <route id="route4B" edges="NtoC_4 CtoS_4"/>
+
+    <flow id="01" type="passenger" begin="0" end="3600" probability="0.4" route="route1"/>
+    <flow id="02" type="passenger" begin="0" end="3600" probability="0.4" route="route2"/>
+    <flow id="03" type="passenger" begin="0" end="3600" probability="0.1" route="route1A"/>
+    <flow id="04" type="passenger" begin="0" end="3600" probability="0.1" route="route1B"/>
+    <flow id="05" type="passenger" begin="0" end="3600" probability="0.1" route="route2A"/>
+    <flow id="06" type="passenger" begin="0" end="3600" probability="0.1" route="route2B"/>
+    <flow id="07" type="passenger" begin="0" end="3600" probability="0.1" route="route3A"/>
+    <flow id="08" type="passenger" begin="0" end="3600" probability="0.1" route="route3B"/>
+    <flow id="09" type="passenger" begin="0" end="3600" probability="0.1" route="route4A"/>
+    <flow id="10" type="passenger" begin="0" end="3600" probability="0.1" route="route4B"/>
+</routes>
