@@ -56,7 +56,7 @@ class Environment():
     def get_log(self):
         return self.queue_length_per_step, self.vehicle_tracker, self.traffic_light_log
 
-    def get_number_vehicle_on_lane(lane, trust_region_length=50, lane_length=150):
+    def get_number_vehicle_on_lane(self, lane, trust_region_length=50, lane_length=150):
         veh_list = traci.lane.getLastStepVehicleIDs(lane)
         n = 0
         for veh in veh_list:
