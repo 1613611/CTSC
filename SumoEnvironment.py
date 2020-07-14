@@ -56,6 +56,14 @@ class Environment():
     def get_log(self):
         return self.queue_length_per_step, self.vehicle_tracker, self.traffic_light_log
 
+    def get_number_vehicle_on_lane(lane, trust_region_length=50, lane_length=150):
+        veh_list = traci.lane.getLastStepVehicleIDs(lane)
+        n = 0
+        for veh in veh_list:
+            if (lane_length - traci.vehicle.getLanePosition(veh) < trust_region_length):
+                n += 1
+        return n
+
     def get_observation(self, agent):
         currentPhase = traci.trafficlight.getPhase(agent)
         number_waiting_veh_on_coming_lanes_allowed = 0
@@ -65,17 +73,17 @@ class Environment():
         if currentPhase == 0:
             for lane in LIST_INCOMING_LANES[agent][0:4]:
                 number_waiting_veh_on_coming_lanes_allowed += traci.lane.getLastStepHaltingNumber(lane)
-                number_veh_on_coming_lanes_allowed += traci.lane.getLastStepVehicleNumber(lane)
+                number_veh_on_coming_lanes_allowed += self.get_number_vehicle_on_lane(lane)
             for lane in LIST_INCOMING_LANES[agent][4:]:
                 number_waiting_veh_on_coming_lanes_disallowed += traci.lane.getLastStepHaltingNumber(lane)
-                number_veh_on_coming_lanes_disallowed += traci.lane.getLastStepVehicleNumber(lane)
+                number_veh_on_coming_lanes_disallowed += self.get_number_vehicle_on_lane(lane)
         elif currentPhase == 2:
             for lane in LIST_INCOMING_LANES[agent][0:4]:
                 number_waiting_veh_on_coming_lanes_disallowed += traci.lane.getLastStepHaltingNumber(lane)
-                number_veh_on_coming_lanes_disallowed += traci.lane.getLastStepVehicleNumber(lane)
+                number_veh_on_coming_lanes_disallowed += self.get_number_vehicle_on_lane(lane)
             for lane in LIST_INCOMING_LANES[agent][4:]:
                 number_waiting_veh_on_coming_lanes_allowed += traci.lane.getLastStepHaltingNumber(lane)
-                number_veh_on_coming_lanes_allowed += traci.lane.getLastStepVehicleNumber(lane)
+                number_veh_on_coming_lanes_allowed += self.get_number_vehicle_on_lane(lane)
         else:
             print('error in get_observation')
         return [number_waiting_veh_on_coming_lanes_allowed, number_veh_on_coming_lanes_allowed, \

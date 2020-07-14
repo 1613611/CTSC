@@ -58,13 +58,13 @@ if args.net_file == '4-arterial-intersections':
     agent_names = ['node1', 'node2', 'node3', 'node4']
     
 if args.heavy_traffic:
-    LOG_QUEUE_LENGTH_FILE_NAME = './log/MARL/%s/queue-length-heavy-traffic' % args.net_file
-    LOG_VEHICLE_FILE_NAME = './log/MARL/%s/vehicle-heavy-traffic' % args.net_file
+    LOG_QUEUE_LENGTH_FILE_NAME = './log/%s/heavy-traffic/MARL/queue-length' % args.net_file
+    LOG_VEHICLE_FILE_NAME = './log/%s/heavy-traffic/MARL/vehicle' % args.net_file
     LOG_TRAFFIC_LIGHT_FILE_NAME = './log/%s/heavy-traffic/MARL/traffic-light.txt' % args.net_file
 
 elif args.light_traffic:
-    LOG_QUEUE_LENGTH_FILE_NAME = './log/MARL/%s/queue-length-light-traffic' % args.net_file
-    LOG_VEHICLE_FILE_NAME = './log/MARL/%s/vehicle-light-traffic' % args.net_file
+    LOG_QUEUE_LENGTH_FILE_NAME = './log/%s/light-traffic/MARL/queue-length' % args.net_file
+    LOG_VEHICLE_FILE_NAME = './log/%s/light-traffic/MARL/vehicle' % args.net_file
     LOG_TRAFFIC_LIGHT_FILE_NAME = './log/%s/light-traffic/MARL/traffic-light.txt' % args.net_file
 
 
