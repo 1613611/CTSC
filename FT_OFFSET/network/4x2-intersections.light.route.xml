@@ -1,0 +1,42 @@
+<routes>
+    <route id="route1A5A" edges="0Ato1A 1Ato2A 2Ato3A 3Ato4A 4Ato5A"/>
+    <route id="route1B5B" edges="0Bto1B 1Bto2B 2Bto3B 3Bto4B 4Bto5B"/>
+    <route id="route1NS" edges="Nto1A 1Ato1B 1BtoS"/>
+    <route id="route1SN" edges="Sto1B 1Bto1A 1AtoN"/>
+    <route id="route2NS" edges="Nto2A 2Ato2B 2BtoS"/>
+    <route id="route2SN" edges="Sto2B 2Bto2A 2AtoN"/>
+    <route id="route3NS" edges="Nto3A 3Ato3B 3BtoS"/>
+    <route id="route3SN" edges="Sto3B 3Bto3A 3AtoN"/>
+    <route id="route4NS" edges="Nto4A 4Ato4B 4BtoS"/>
+    <route id="route4SN" edges="Sto4B 4Bto4A 4AtoN"/>
+
+    <flow id="01AC" type="passenger" begin="0" end="3600" probability="0.05" route="route1A5A"/>
+    <flow id="01AM" type="moped" begin="0" end="3600" probability="0.2" route="route1A5A"/>
+
+    <flow id="01BC" type="passenger" begin="0" end="3600" probability="0.05" route="route1B5B"/>
+    <flow id="01BM" type="moped" begin="0" end="3600" probability="0.2" route="route1B5B"/>
+
+    <flow id="01NSC" type="passenger" begin="0" end="3600" probability="0.01" route="route1NS"/>
+    <flow id="01NSM" type="moped" begin="0" end="3600" probability="0.04" route="route1NS"/>
+
+    <flow id="01SNC" type="passenger" begin="0" end="3600" probability="0.01" route="route1SN"/>
+    <flow id="01SNM" type="moped" begin="0" end="3600" probability="0.04" route="route1SN"/>
+
+    <flow id="02NSC" type="passenger" begin="0" end="3600" probability="0.01" route="route2NS"/>
+    <flow id="02NSM" type="moped" begin="0" end="3600" probability="0.04" route="route2NS"/>
+
+    <flow id="02SNC" type="passenger" begin="0" end="3600" probability="0.01" route="route2SN"/>
+    <flow id="02SNM" type="moped" begin="0" end="3600" probability="0.04" route="route2SN"/>
+
+    <flow id="03NSC" type="passenger" begin="0" end="3600" probability="0.01" route="route3NS"/>
+    <flow id="03NSM" type="moped" begin="0" end="3600" probability="0.04" route="route3NS"/>
+
+    <flow id="03SNC" type="passenger" begin="0" end="3600" probability="0.01" route="route3SN"/>
+    <flow id="03SNM" type="moped" begin="0" end="3600" probability="0.04" route="route3SN"/>
+
+    <flow id="04NSC" type="passenger" begin="0" end="3600" probability="0.01" route="route4NS"/>
+    <flow id="04NSM" type="moped" begin="0" end="3600" probability="0.04" route="route4NS"/>
+
+    <flow id="04SNC" type="passenger" begin="0" end="3600" probability="0.01" route="route4SN"/>
+    <flow id="04SNM" type="moped" begin="0" end="3600" probability="0.04" route="route4SN"/>
+</routes>
