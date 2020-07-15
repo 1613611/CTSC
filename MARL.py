@@ -56,7 +56,29 @@ env = Environment(args)
 
 if args.net_file == '4-arterial-intersections':
     agent_names = ['node1', 'node2', 'node3', 'node4']
-    
+    LIST_INCOMING_LANES_LOG_QUEUE_LENGTH =   {
+                                'node1': ['0Ato1A_0', '0Ato1A_1', '2Ato1A_0', '2Ato1A_1', 'Nto1A_0', 'Nto1A_1', '1Bto1A_0', '1Bto1A_1'],
+                                'node2': ['1Ato2A_0', '1Ato2A_1', '3Ato2A_0', '3Ato2A_1', 'Nto2A_0', 'Nto2A_1', '2Bto2A_0', '2Bto2A_1'],
+                                'node3': ['2Ato3A_0', '2Ato3A_1', '4Ato3A_0', '4Ato3A_1', 'Nto3A_0', 'Nto3A_1', '3Bto3A_0', '3Bto3A_1'],
+                                'node4': ['3Ato4A_0', '3Ato4A_1', '5Ato4A_0', '5Ato4A_1', 'Nto4A_0', 'Nto4A_1', '4Bto4A_0', '4Bto4A_1'],
+                                'node1B': ['0Bto1B_0', '0Bto1B_1', '2Bto1B_0', '2Bto1B_1', '1Ato1B_0', '1Ato1B_1', 'Sto1B_0', 'Sto1B_1'],
+                                'node2B': ['1Bto2B_0', '1Bto2B_1', '3Bto2B_0', '3Bto2B_1', '2Ato2B_0', '2Ato2B_1', 'Sto2B_0', 'Sto2B_1'],
+                                'node3B': ['2Bto3B_0', '2Bto3B_1', '4Bto3B_0', '4Bto3B_1', '3Ato3B_0', '3Ato3B_1', 'Sto3B_0', 'Sto3B_1'],
+                                'node4B': ['3Bto4B_0', '3Bto4B_1', '5Bto4B_0', '5Bto4B_1', '4Ato4B_0', '4Ato4B_1', 'Sto4B_0', 'Sto4B_1']
+                            }
+elif args.net_file == '4x2-intersections':
+    agent_names = ['node1', 'node2', 'node3', 'node4', 'node1B', 'node2B', 'node3B', 'node4B']
+    LIST_INCOMING_LANES_LOG_QUEUE_LENGTH = [ '0Ato1A_0', '0Ato1A_1', '2Ato1A_0', '2Ato1A_1', 'Nto1A_0', 'Nto1A_1', '1Bto1A_0', '1Bto1A_1',\
+                        '1Ato2A_0', '1Ato2A_1', '3Ato2A_0', '3Ato2A_1', 'Nto2A_0', 'Nto2A_1', '2Bto2A_0', '2Bto2A_1',\
+                        '2Ato3A_0', '2Ato3A_1', '4Ato3A_0', '4Ato3A_1', 'Nto3A_0', 'Nto3A_1', '3Bto3A_0', '3Bto3A_1',\
+                        '3Ato4A_0', '3Ato4A_1', '5Ato4A_0', '5Ato4A_1', 'Nto4A_0', 'Nto4A_1', '4Bto4A_0', '4Bto4A_1',\
+                        '0Bto1B_0', '0Bto1B_1', '2Bto1B_0', '2Bto1B_1', '1Ato1B_0', '1Ato1B_1', 'Sto1B_0', 'Sto1B_1',\
+                        '1Bto2B_0', '1Bto2B_1', '3Bto2B_0', '3Bto2B_1', '2Ato2B_0', '2Ato2B_1', 'Sto2B_0', 'Sto2B_1',\
+                        '2Bto3B_0', '2Bto3B_1', '4Bto3B_0', '4Bto3B_1', '3Ato3B_0', '3Ato3B_1', 'Sto3B_0', 'Sto3B_1',\
+                        '3Bto4B_0', '3Bto4B_1', '5Bto4B_0', '5Bto4B_1', '4Ato4B_0', '4Ato4B_1', 'Sto4B_0', 'Sto4B_1',\
+                    ]
+
+
 if args.heavy_traffic:
     LOG_QUEUE_LENGTH_FILE_NAME = './log/%s/heavy-traffic/MARL/queue-length' % args.net_file
     LOG_VEHICLE_FILE_NAME = './log/%s/heavy-traffic/MARL/vehicle' % args.net_file
@@ -113,14 +135,15 @@ if args.trial:
 
     os.makedirs(os.path.dirname(LOG_TRAFFIC_LIGHT_FILE_NAME), exist_ok=True)
     log_tls_file = open(LOG_TRAFFIC_LIGHT_FILE_NAME, "w")
-    log_tls_file.write('step,node1,node2,node3,node4\n')
+    log_tls_file.write('step')
+    for agent in agent_names:
+        log_tls_file.write(',%s' % agent)
+    log_tls_file.write('\n')
     for idx, log in enumerate(tls_log):
         log_tls_file.write('%d' % idx)
         [log_tls_file.write(',%d' % val) for val in log]
         log_tls_file.write('\n')
     sys.exit(0)
-
-    
 
 for _ in range(N_EPISODES_PRETRAIN):
     env.reset()
@@ -198,10 +221,12 @@ for epi in range(N_EPISODES_TRAIN):
     # Log to visualize
     log_QL, log_Veh, _ = env.get_log()
     log_QL_address = LOG_QUEUE_LENGTH_FILE_NAME + '/%d.txt' % epi
+    
     os.makedirs(os.path.dirname(log_QL_address), exist_ok=True)
     log_QL_file = open(log_QL_address, "w")
-    if args.net_file == '4-arterial-intersections':
-        log_QL_file.write('STEP,W11,W12,N11,N12,E11,E12,S11,S12,W21,W22,N21,N22,E21,E22,S21,S22,W31,W32,N31,N32,E31,E32,S31,S32,W41,W42,N41,N42,E41,E42,S41,S42\n')
+    log_QL_file.write('step')
+    [log_QL_file.write(',%s' % lane) for lane in LIST_INCOMING_LANES_LOG_QUEUE_LENGTH]
+    log_QL_file.write('\n')
     for idx, q_length in enumerate(log_QL):
         str_q_length = str(idx)
         for q in q_length:

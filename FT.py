@@ -35,7 +35,19 @@ if args.net_file == '4-arterial-intersections':
     DISTANCE_OF_ROUTE = {"route1": 830, "route2": 830, "route1A": 320, "route1B": 320, "route2A": 320, "route2B": 320, \
                          "route3A": 320, "route3B": 320, "route4A": 320, "route4B": 320}    
     TRAFFIC_SIGNAL_LIGHT_NAMES = ['node1', 'node2', 'node3', 'node4']
-    MOVEMENT_DISTANCE = [150*5 + 4*20, 150*2 + 20]
+elif args.net_file == '4x2-intersections':
+    LIST_INCOMING_LANES = [ '0Ato1A_0', '0Ato1A_1', '2Ato1A_0', '2Ato1A_1', 'Nto1A_0', 'Nto1A_1', '1Bto1A_0', '1Bto1A_1',\
+                            '1Ato2A_0', '1Ato2A_1', '3Ato2A_0', '3Ato2A_1', 'Nto2A_0', 'Nto2A_1', '2Bto2A_0', '2Bto2A_1',\
+                            '2Ato3A_0', '2Ato3A_1', '4Ato3A_0', '4Ato3A_1', 'Nto3A_0', 'Nto3A_1', '3Bto3A_0', '3Bto3A_1',\
+                            '3Ato4A_0', '3Ato4A_1', '5Ato4A_0', '5Ato4A_1', 'Nto4A_0', 'Nto4A_1', '4Bto4A_0', '4Bto4A_1',\
+                            '0Bto1B_0', '0Bto1B_1', '2Bto1B_0', '2Bto1B_1', '1Ato1B_0', '1Ato1B_1', 'Sto1B_0', 'Sto1B_1',\
+                            '1Bto2B_0', '1Bto2B_1', '3Bto2B_0', '3Bto2B_1', '2Ato2B_0', '2Ato2B_1', 'Sto2B_0', 'Sto2B_1',\
+                            '2Bto3B_0', '2Bto3B_1', '4Bto3B_0', '4Bto3B_1', '3Ato3B_0', '3Ato3B_1', 'Sto3B_0', 'Sto3B_1',\
+                            '3Bto4B_0', '3Bto4B_1', '5Bto4B_0', '5Bto4B_1', '4Ato4B_0', '4Ato4B_1', 'Sto4B_0', 'Sto4B_1',\
+                        ]
+    DISTANCE_OF_ROUTE = {"route1A5A": 830, "route1B5B": 830, "route1NS": 490, "route1SN": 490, "route2NS": 490, "route2SN": 490, \
+                         "route3NS": 490, "route3SN": 490, "route4NS": 490, "route4SN": 490}
+    TRAFFIC_SIGNAL_LIGHT_NAMES = ['node1', 'node2', 'node3', 'node4', 'node1B', 'node2B', 'node3B', 'node4B']
 
 if args.heavy_traffic:
     sumoCmd.extend(['-r', './network/%s.heavy.route.xml' % args.net_file])
@@ -59,15 +71,19 @@ class Simulation_FT():
         self.current_phase_duration = 0
         self.queue_length_per_step = []
 
-        os.makedirs(os.path.dirname(LOG_TRAFFIC_LIGHT_FILE_NAME), exist_ok=True)
-        self.log_traffic_light = open(LOG_TRAFFIC_LIGHT_FILE_NAME, "w")
 
         os.makedirs(os.path.dirname(LOG_QUEUE_LENGTH_FILE_NAME), exist_ok=True)
         self.log_QL_file = open(LOG_QUEUE_LENGTH_FILE_NAME, "w")
-        if args.net_file == '4-arterial-intersections':
-            self.log_QL_file.write('STEP,W11,W12,N11,N12,E11,E12,S11,S12,W21,W22,N21,N22,E21,E22,S21,S22,W31,W32,N31,N32,E31,E32,S31,S32,W41,W42,N41,N42,E41,E42,S41,S42\n')
-            self.log_traffic_light.write('step,node1,node2,node3,node4\n')
+        self.log_QL_file.write('step')
+        [self.log_QL_file.write(',%s' % lane) for lane in LIST_INCOMING_LANES]
+        self.log_QL_file.write('\n')
 
+        os.makedirs(os.path.dirname(LOG_TRAFFIC_LIGHT_FILE_NAME), exist_ok=True)
+        self.log_traffic_light = open(LOG_TRAFFIC_LIGHT_FILE_NAME, "w")
+        self.log_traffic_light.write('step')
+        [self.log_traffic_light.write(',%s' % tls) for tls in TRAFFIC_SIGNAL_LIGHT_NAMES]
+        self.log_traffic_light.write('\n')
+        
         os.makedirs(os.path.dirname(LOG_VEHICLE_FILE_NAME), exist_ok=True)
         self.log_Veh_file = open(LOG_VEHICLE_FILE_NAME, "w")
         self.log_Veh_file.write('VehID,DepartedTime,ArrivedTime,RouteID,TravelTime,AverageSpeed\n')            
