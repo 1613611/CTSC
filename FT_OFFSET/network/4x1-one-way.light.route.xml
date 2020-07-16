@@ -1,0 +1,35 @@
+<routes>
+    <route id="route1" edges="0to1 1to2 2to3 3to4 4to5"/>
+    <route id="route1A" edges="StoC_1 CtoN_1"/>
+    <route id="route1B" edges="NtoC_1 CtoS_1"/>
+    <route id="route2A" edges="StoC_2 CtoN_2"/>
+    <route id="route2B" edges="NtoC_2 CtoS_2"/>
+    <route id="route3A" edges="StoC_3 CtoN_3"/>
+    <route id="route3B" edges="NtoC_3 CtoS_3"/>
+    <route id="route4A" edges="StoC_4 CtoN_4"/>
+    <route id="route4B" edges="NtoC_4 CtoS_4"/>
+
+    <flow id="01A" type="passenger" begin="0" end="3600" probability="0.1" route="route1" departLane="random"/>
+    <flow id="01B" type="moped" begin="0" end="3600" probability="0.4" route="route1" departLane="random"/>
+
+    <flow id="1AC" type="passenger" begin="0" end="3600" probability="0.01" route="route1A" departLane="random"/>
+    <flow id="1AM" type="moped" begin="0" end="3600" probability="0.04" route="route1A" departLane="random"/>
+    <flow id="1BC" type="passenger" begin="0" end="3600" probability="0.01" route="route1B" departLane="random"/>
+    <flow id="1BM" type="moped" begin="0" end="3600" probability="0.04" route="route1B" departLane="random"/>
+
+    <flow id="2AC" type="passenger" begin="0" end="3600" probability="0.01" route="route2A" departLane="random"/>
+    <flow id="2AM" type="moped" begin="0" end="3600" probability="0.04" route="route2A" departLane="random"/>
+    <flow id="2BC" type="passenger" begin="0" end="3600" probability="0.01" route="route2B" departLane="random"/>
+    <flow id="2BM" type="moped" begin="0" end="3600" probability="0.04" route="route2B" departLane="random"/>
+
+
+    <flow id="3AC" type="passenger" begin="0" end="3600" probability="0.01" route="route3A" departLane="random"/>
+    <flow id="3AM" type="moped" begin="0" end="3600" probability="0.04" route="route3A" departLane="random"/>
+    <flow id="3BC" type="passenger" begin="0" end="3600" probability="0.01" route="route3B" departLane="random"/>
+    <flow id="3BM" type="moped" begin="0" end="3600" probability="0.04" route="route3B" departLane="random"/>
+
+    <flow id="4AC" type="passenger" begin="0" end="3600" probability="0.01" route="route4A" departLane="random"/>
+    <flow id="4AM" type="moped" begin="0" end="3600" probability="0.04" route="route4A" departLane="random"/>
+    <flow id="4BC" type="passenger" begin="0" end="3600" probability="0.01" route="route4B" departLane="random"/>
+    <flow id="4BM" type="moped" begin="0" end="3600" probability="0.04" route="route4B" departLane="random"/>
+</routes>
