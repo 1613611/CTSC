@@ -63,7 +63,13 @@ if args.net_file == '4-arterial-intersections':
             '2to3_0', 'NtoC_3_0', '4to3_0', 'StoC_3_0', '3to4_0', 'NtoC_4_0', '5to4_0', 'StoC_4_0',\
             '0to1_1', 'NtoC_1_1', '2to1_1', 'StoC_1_1', '1to2_1', 'NtoC_2_1', '3to2_1', 'StoC_2_1',\
             '2to3_1', 'NtoC_3_1', '4to3_1', 'StoC_3_1', '3to4_1', 'NtoC_4_1', '5to4_1', 'StoC_4_1']
-
+elif args.net_file == '4x1-one-way':
+    agent_names = ['node1', 'node2', 'node3', 'node4']
+    N_AGENTS = 4
+    LIST_INCOMING_LANES_LOG_QUEUE_LENGTH = ['0to1_0', '0to1_1', '0to1_2', '0to1_3', 'NtoC_1_0', 'NtoC_1_1', 'StoC_1_0', 'StoC_1_1', \
+                                    '1to2_0', '1to2_1', '1to2_2', '1to2_3', 'NtoC_2_0', 'NtoC_2_1', 'StoC_2_0', 'StoC_2_1', \
+                                    '2to3_0', '2to3_1', '2to3_2', '2to3_3', 'NtoC_3_0', 'NtoC_3_1', 'StoC_3_0', 'StoC_3_1', \
+                                    '3to4_0', '3to4_1', '3to4_2', '3to4_3', 'NtoC_4_0', 'NtoC_4_1', 'StoC_4_0', 'StoC_4_1']
 elif args.net_file == '4x2-intersections':
     agent_names = ['node1', 'node2', 'node3', 'node4', 'node1B', 'node2B', 'node3B', 'node4B']
     N_AGENTS = 8

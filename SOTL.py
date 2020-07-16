@@ -44,6 +44,20 @@ if args.net_file == '4-arterial-intersections':
     DISTANCE_OF_ROUTE = {"route1": 830, "route2": 830, "route1A": 320, "route1B": 320, "route2A": 320, "route2B": 320, \
                          "route3A": 320, "route3B": 320, "route4A": 320, "route4B": 320}    
     TRAFFIC_SIGNAL_LIGHT_NAMES = ['node1', 'node2', 'node3', 'node4']
+elif args.net_file == '4x1-one-way':
+    LIST_INCOMING_LANES =   {
+                                'node1': ['0to1_0', '0to1_1', '0to1_2', '0to1_3', 'NtoC_1_0', 'NtoC_1_1', 'StoC_1_0', 'StoC_1_1'],
+                                'node2': ['1to2_0', '1to2_1', '1to2_2', '1to2_3', 'NtoC_2_0', 'NtoC_2_1', 'StoC_2_0', 'StoC_2_1'],
+                                'node3': ['2to3_0', '2to3_1', '2to3_2', '2to3_3', 'NtoC_3_0', 'NtoC_3_1', 'StoC_3_0', 'StoC_3_1'],
+                                'node4': ['3to4_0', '3to4_1', '3to4_2', '3to4_3', 'NtoC_4_0', 'NtoC_4_1', 'StoC_4_0', 'StoC_4_1']
+                            }
+    LIST_INCOMING_LANES_LOG_QUEUE_LENGTH = ['0to1_0', '0to1_1', '0to1_2', '0to1_3', 'NtoC_1_0', 'NtoC_1_1', 'StoC_1_0', 'StoC_1_1', \
+                                        '1to2_0', '1to2_1', '1to2_2', '1to2_3', 'NtoC_2_0', 'NtoC_2_1', 'StoC_2_0', 'StoC_2_1', \
+                                        '2to3_0', '2to3_1', '2to3_2', '2to3_3', 'NtoC_3_0', 'NtoC_3_1', 'StoC_3_0', 'StoC_3_1', \
+                                        '3to4_0', '3to4_1', '3to4_2', '3to4_3', 'NtoC_4_0', 'NtoC_4_1', 'StoC_4_0', 'StoC_4_1']
+    DISTANCE_OF_ROUTE = {"route1": 830, "route1A": 320, "route1B": 320, "route2A": 320, "route2B": 320, \
+                         "route3A": 320, "route3B": 320, "route4A": 320, "route4B": 320}    
+    TRAFFIC_SIGNAL_LIGHT_NAMES = ['node1', 'node2', 'node3', 'node4']
 elif args.net_file == '4x2-intersections':
     LIST_INCOMING_LANES =   {
                                 'node1': ['0Ato1A_0', '0Ato1A_1', '2Ato1A_0', '2Ato1A_1', 'Nto1A_0', 'Nto1A_1', '1Bto1A_0', '1Bto1A_1'],
@@ -159,13 +173,12 @@ class Simulation_SOTL():
         flags = dict()
         for tls in TRAFFIC_SIGNAL_LIGHT_NAMES:
             currentPhase = traci.trafficlight.getPhase(tls)
-            if currentPhase == 0:
+            if currentPhase == 2:
                 allow_idx = [0, 4]
                 disallow_idx = [4, 8]
-            elif currentPhase == 2:
+            elif currentPhase == 0:
                 allow_idx = [4, 8]
                 disallow_idx = [0, 4]
-
             number_veh_lane_allowing = 0
             number_veh_lane_disallowing = 0
             for lane in LIST_INCOMING_LANES[tls][allow_idx[0]:allow_idx[1]]:
@@ -174,7 +187,7 @@ class Simulation_SOTL():
                 number_veh_lane_disallowing += traci.lane.getLastStepVehicleNumber(lane)
             if number_veh_lane_allowing < MIN_GREEN_VEHICLE and number_veh_lane_disallowing > MAX_RED_VEHICLE:        
                 traci.trafficlight.setPhase(tls, currentPhase + 1)
-                flags[tls] = True        
+                flags[tls] = True
         if len(flags.keys()) <= 0:
             return
         for _ in range(3):
@@ -185,7 +198,6 @@ class Simulation_SOTL():
                 traci.trafficlight.setPhase(tls, 0)
             else:
                 traci.trafficlight.setPhase(tls, currentPhase + 1)
-
     def isFinised(self):
         if traci.simulation.getMinExpectedNumber() <= 0:
             self.log_step()

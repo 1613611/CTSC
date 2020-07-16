@@ -12,6 +12,7 @@ import random
 import argparse
 from prettytable import PrettyTable
 import os
+
 ACTION_SPACE = 2
 STATE_SPACE = 4
 

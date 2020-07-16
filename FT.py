@@ -28,7 +28,7 @@ sumoCmd = [sumoBinary, sumoConfig[0], sumoConfig[1]]
 sumoCmd.extend(['-n', './network/%s.net.xml' % args.net_file])
 
 if args.net_file == '4-arterial-intersections':
-    LIST_INCOMING_LANES = [ '0to1_0', 'NtoC_1_0', '2to1_0', 'StoC_1_0', '1to2_0', 'NtoC_2_0', '3to2_0', 'StoC_2_0',\
+    LIST_INCOMING_LANES_LOG_QUEUE_LENGTH = [ '0to1_0', 'NtoC_1_0', '2to1_0', 'StoC_1_0', '1to2_0', 'NtoC_2_0', '3to2_0', 'StoC_2_0',\
                             '2to3_0', 'NtoC_3_0', '4to3_0', 'StoC_3_0', '3to4_0', 'NtoC_4_0', '5to4_0', 'StoC_4_0',\
                             '0to1_1', 'NtoC_1_1', '2to1_1', 'StoC_1_1', '1to2_1', 'NtoC_2_1', '3to2_1', 'StoC_2_1',\
                             '2to3_1', 'NtoC_3_1', '4to3_1', 'StoC_3_1', '3to4_1', 'NtoC_4_1', '5to4_1', 'StoC_4_1']
@@ -36,7 +36,7 @@ if args.net_file == '4-arterial-intersections':
                          "route3A": 320, "route3B": 320, "route4A": 320, "route4B": 320}    
     TRAFFIC_SIGNAL_LIGHT_NAMES = ['node1', 'node2', 'node3', 'node4']
 elif args.net_file == '4x2-intersections':
-    LIST_INCOMING_LANES = [ '0Ato1A_0', '0Ato1A_1', '2Ato1A_0', '2Ato1A_1', 'Nto1A_0', 'Nto1A_1', '1Bto1A_0', '1Bto1A_1',\
+    LIST_INCOMING_LANES_LOG_QUEUE_LENGTH = [ '0Ato1A_0', '0Ato1A_1', '2Ato1A_0', '2Ato1A_1', 'Nto1A_0', 'Nto1A_1', '1Bto1A_0', '1Bto1A_1',\
                             '1Ato2A_0', '1Ato2A_1', '3Ato2A_0', '3Ato2A_1', 'Nto2A_0', 'Nto2A_1', '2Bto2A_0', '2Bto2A_1',\
                             '2Ato3A_0', '2Ato3A_1', '4Ato3A_0', '4Ato3A_1', 'Nto3A_0', 'Nto3A_1', '3Bto3A_0', '3Bto3A_1',\
                             '3Ato4A_0', '3Ato4A_1', '5Ato4A_0', '5Ato4A_1', 'Nto4A_0', 'Nto4A_1', '4Bto4A_0', '4Bto4A_1',\
@@ -48,6 +48,14 @@ elif args.net_file == '4x2-intersections':
     DISTANCE_OF_ROUTE = {"route1A5A": 830, "route1B5B": 830, "route1NS": 490, "route1SN": 490, "route2NS": 490, "route2SN": 490, \
                          "route3NS": 490, "route3SN": 490, "route4NS": 490, "route4SN": 490}
     TRAFFIC_SIGNAL_LIGHT_NAMES = ['node1', 'node2', 'node3', 'node4', 'node1B', 'node2B', 'node3B', 'node4B']
+elif args.net_file == '4x1-one-way':
+    LIST_INCOMING_LANES_LOG_QUEUE_LENGTH = ['0to1_0', '0to1_1', '0to1_2', '0to1_3', 'NtoC_1_0', 'NtoC_1_1', 'StoC_1_0', 'StoC_1_1', \
+                                            '1to2_0', '1to2_1', '1to2_2', '1to2_3', 'NtoC_2_0', 'NtoC_2_1', 'StoC_2_0', 'StoC_2_1', \
+                                            '2to3_0', '2to3_1', '2to3_2', '2to3_3', 'NtoC_3_0', 'NtoC_3_1', 'StoC_3_0', 'StoC_3_1', \
+                                            '3to4_0', '3to4_1', '3to4_2', '3to4_3', 'NtoC_4_0', 'NtoC_4_1', 'StoC_4_0', 'StoC_4_1']
+    DISTANCE_OF_ROUTE = {"route1": 830, "route1A": 320, "route1B": 320, "route2A": 320, "route2B": 320, \
+                         "route3A": 320, "route3B": 320, "route4A": 320, "route4B": 320}    
+    TRAFFIC_SIGNAL_LIGHT_NAMES = ['node1', 'node2', 'node3', 'node4']
 
 if args.heavy_traffic:
     sumoCmd.extend(['-r', './network/%s.heavy.route.xml' % args.net_file])
@@ -62,11 +70,12 @@ elif args.light_traffic:
 
 
 
-PHASE_1_LENGTH = 20
-PHASE_2_LENGTH = 10
+PHASE_1_LENGTH = 15
+PHASE_2_LENGTH = 15
 
 class Simulation_FT():
     def __init__(self):
+        print(sumoCmd)
         traci.start(sumoCmd)
         self.current_phase_duration = 0
         self.queue_length_per_step = []
@@ -75,7 +84,7 @@ class Simulation_FT():
         os.makedirs(os.path.dirname(LOG_QUEUE_LENGTH_FILE_NAME), exist_ok=True)
         self.log_QL_file = open(LOG_QUEUE_LENGTH_FILE_NAME, "w")
         self.log_QL_file.write('step')
-        [self.log_QL_file.write(',%s' % lane) for lane in LIST_INCOMING_LANES]
+        [self.log_QL_file.write(',%s' % lane) for lane in LIST_INCOMING_LANES_LOG_QUEUE_LENGTH]
         self.log_QL_file.write('\n')
 
         os.makedirs(os.path.dirname(LOG_TRAFFIC_LIGHT_FILE_NAME), exist_ok=True)
@@ -98,7 +107,7 @@ class Simulation_FT():
     def log_step(self):
         # QUEUE_LENGTH
         q_length = []
-        for lane in LIST_INCOMING_LANES:
+        for lane in LIST_INCOMING_LANES_LOG_QUEUE_LENGTH:
             q_length.append(traci.lane.getLastStepHaltingNumber(lane))
         str_q_length = str(traci.simulation.getTime())
         for q in q_length:

@@ -50,6 +50,28 @@ if args.net_file == '4-arterial-intersections':
     DISTANCE_OF_ROUTE = {"route1": 830, "route2": 830, "route1A": 320, "route1B": 320, "route2A": 320, "route2B": 320, \
                          "route3A": 320, "route3B": 320, "route4A": 320, "route4B": 320}    
     TRAFFIC_SIGNAL_LIGHT_NAMES = ['node1', 'node2', 'node3', 'node4']
+elif args.net_file == '4x1-one-way':
+    LIST_INCOMING_LANES =   {
+                            'node1': ['0to1_0', '0to1_1', '0to1_2', '0to1_3', 'NtoC_1_0', 'NtoC_1_1', 'StoC_1_0', 'StoC_1_1'],
+                            'node2': ['1to2_0', '1to2_1', '1to2_2', '1to2_3', 'NtoC_2_0', 'NtoC_2_1', 'StoC_2_0', 'StoC_2_1'],
+                            'node3': ['2to3_0', '2to3_1', '2to3_2', '2to3_3', 'NtoC_3_0', 'NtoC_3_1', 'StoC_3_0', 'StoC_3_1'],
+                            'node4': ['3to4_0', '3to4_1', '3to4_2', '3to4_3', 'NtoC_4_0', 'NtoC_4_1', 'StoC_4_0', 'StoC_4_1']
+                        }
+    LIST_OUTGOING_LANES =   {
+                            'node1': ['1to2_0', '1to2_1', '1to2_2', '1to2_3', 'CtoS_1_0', 'CtoS_1_1', 'CtoN_1_0', 'CtoN_1_1'],
+                            'node2': ['2to3_0', '2to3_1', '2to3_2', '2to3_3', 'CtoS_2_0', 'CtoS_2_1', 'CtoN_2_0', 'CtoN_2_1'],
+                            'node3': ['3to4_0', '3to4_1', '3to4_2', '3to4_3', 'CtoS_3_0', 'CtoS_3_1', 'CtoN_3_0', 'CtoN_3_1'],
+                            'node4': ['4to5_0', '4to5_1', '4to5_2', '4to5_3', 'CtoS_4_0', 'CtoS_4_1', 'CtoN_4_0', 'CtoN_4_1'],
+                        }
+    LIST_INCOMING_LANES_LOG_QUEUE_LENGTH = ['0to1_0', '0to1_1', '0to1_2', '0to1_3', 'NtoC_1_0', 'NtoC_1_1', 'StoC_1_0', 'StoC_1_1', \
+                                        '1to2_0', '1to2_1', '1to2_2', '1to2_3', 'NtoC_2_0', 'NtoC_2_1', 'StoC_2_0', 'StoC_2_1', \
+                                        '2to3_0', '2to3_1', '2to3_2', '2to3_3', 'NtoC_3_0', 'NtoC_3_1', 'StoC_3_0', 'StoC_3_1', \
+                                        '3to4_0', '3to4_1', '3to4_2', '3to4_3', 'NtoC_4_0', 'NtoC_4_1', 'StoC_4_0', 'StoC_4_1']
+    DISTANCE_OF_ROUTE = {"route1": 830, "route1A": 320, "route1B": 320, "route2A": 320, "route2B": 320, \
+                         "route3A": 320, "route3B": 320, "route4A": 320, "route4B": 320}    
+    TRAFFIC_SIGNAL_LIGHT_NAMES = ['node1', 'node2', 'node3', 'node4']
+
+
 elif args.net_file == '4x2-intersections':
     LIST_INCOMING_LANES =   {
                             'node1': ['0Ato1A_0', '0Ato1A_1', '2Ato1A_0', '2Ato1A_1', 'Nto1A_0', 'Nto1A_1', '1Bto1A_0', '1Bto1A_1'],
@@ -185,8 +207,8 @@ class Simulation_SOTL():
                 pressure_array.append(traci.lane.getLastStepVehicleNumber(LIST_INCOMING_LANES[tls][idx]) \
                                         - traci.lane.getLastStepVehicleNumber(LIST_OUTGOING_LANES[tls][idx]))   
             willChange = False
-            if (currentPhase == 0 and np.sum(pressure_array[0:4]) < np.sum(pressure_array[4:8]))\
-                    or (currentPhase == 2 and np.sum(pressure_array[0:4]) > np.sum(pressure_array[4:8])):
+            if (currentPhase == 2 and np.sum(pressure_array[0:4]) < np.sum(pressure_array[4:8]))\
+                    or (currentPhase == 0 and np.sum(pressure_array[0:4]) > np.sum(pressure_array[4:8])):
                 traci.trafficlight.setPhase(tls, currentPhase + 1)
                 flags[tls] = True
         if len(flags.keys()) <= 0:

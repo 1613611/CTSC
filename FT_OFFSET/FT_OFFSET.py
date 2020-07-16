@@ -35,6 +35,14 @@ if args.net_file == '4-arterial-intersections':
     DISTANCE_OF_ROUTE = {"route1": 830, "route2": 830, "route1A": 320, "route1B": 320, "route2A": 320, "route2B": 320, \
                          "route3A": 320, "route3B": 320, "route4A": 320, "route4B": 320}    
     TRAFFIC_SIGNAL_LIGHT_NAMES = ['node1', 'node2', 'node3', 'node4']
+elif args.net_file == '4x1-one-way':
+    LIST_INCOMING_LANES_LOG_QUEUE_LENGTH = ['0to1_0', '0to1_1', '0to1_2', '0to1_3', 'NtoC_1_0', 'NtoC_1_1', 'StoC_1_0', 'StoC_1_1', \
+                                        '1to2_0', '1to2_1', '1to2_2', '1to2_3', 'NtoC_2_0', 'NtoC_2_1', 'StoC_2_0', 'StoC_2_1', \
+                                        '2to3_0', '2to3_1', '2to3_2', '2to3_3', 'NtoC_3_0', 'NtoC_3_1', 'StoC_3_0', 'StoC_3_1', \
+                                        '3to4_0', '3to4_1', '3to4_2', '3to4_3', 'NtoC_4_0', 'NtoC_4_1', 'StoC_4_0', 'StoC_4_1']
+    DISTANCE_OF_ROUTE = {"route1": 830, "route1A": 320, "route1B": 320, "route2A": 320, "route2B": 320, \
+                         "route3A": 320, "route3B": 320, "route4A": 320, "route4B": 320}    
+    TRAFFIC_SIGNAL_LIGHT_NAMES = ['node1', 'node2', 'node3', 'node4']
 elif args.net_file == '4x2-intersections':
     LIST_INCOMING_LANES_LOG_QUEUE_LENGTH = [ '0Ato1A_0', '0Ato1A_1', '2Ato1A_0', '2Ato1A_1', 'Nto1A_0', 'Nto1A_1', '1Bto1A_0', '1Bto1A_1',\
                         '1Ato2A_0', '1Ato2A_1', '3Ato2A_0', '3Ato2A_1', 'Nto2A_0', 'Nto2A_1', '2Bto2A_0', '2Bto2A_1',\
@@ -63,7 +71,7 @@ elif args.light_traffic:
 
 
 
-PHASE_1_LENGTH = 25
+PHASE_1_LENGTH = 15
 OFFSET = 15
 
 class Simulation_FT():
@@ -128,12 +136,6 @@ class Simulation_FT():
             s += ',%d' % traci.trafficlight.getPhase(tls)
         self.log_traffic_light.write(s + '\n')
 
-    def initPhase(self):
-        for idx, name in enumerate(TRAFFIC_SIGNAL_LIGHT_NAMES[0:4]):
-            traci.trafficlight.setPhaseDuration(name, PHASE_1_LENGTH + idx*OFFSET)
-        for idx, name in enumerate(TRAFFIC_SIGNAL_LIGHT_NAMES[4:]):
-            traci.trafficlight.setPhaseDuration(name, PHASE_1_LENGTH + idx*OFFSET + 7.5)
-
     def isFinised(self):
         if traci.simulation.getMinExpectedNumber() <= 0:
             self.log_step()
@@ -152,6 +154,5 @@ class Simulation_FT():
         self.nextStep()
 
 s = Simulation_FT()
-s.initPhase()
 while s.isFinised() != True:
     s.makeAction()

@@ -42,9 +42,23 @@ class Environment():
                         '2to3_0', 'NtoC_3_0', '4to3_0', 'StoC_3_0', '3to4_0', 'NtoC_4_0', '5to4_0', 'StoC_4_0',\
                         '0to1_1', 'NtoC_1_1', '2to1_1', 'StoC_1_1', '1to2_1', 'NtoC_2_1', '3to2_1', 'StoC_2_1',\
                         '2to3_1', 'NtoC_3_1', '4to3_1', 'StoC_3_1', '3to4_1', 'NtoC_4_1', '5to4_1', 'StoC_4_1']
-
-
             INTERSECTION_NAMES = ['node1', 'node2', 'node3', 'node4']
+
+        elif args.net_file == '4x1-one-way':
+            LIST_INCOMING_LANES =   {
+                            'node1': ['0to1_0', '0to1_1', '0to1_2', '0to1_3', 'NtoC_1_0', 'NtoC_1_1', 'StoC_1_0', 'StoC_1_1'],
+                            'node2': ['1to2_0', '1to2_1', '1to2_2', '1to2_3', 'NtoC_2_0', 'NtoC_2_1', 'StoC_2_0', 'StoC_2_1'],
+                            'node3': ['2to3_0', '2to3_1', '2to3_2', '2to3_3', 'NtoC_3_0', 'NtoC_3_1', 'StoC_3_0', 'StoC_3_1'],
+                            'node4': ['3to4_0', '3to4_1', '3to4_2', '3to4_3', 'NtoC_4_0', 'NtoC_4_1', 'StoC_4_0', 'StoC_4_1']
+                        }
+            LIST_INCOMING_LANES_LOG_QUEUE_LENGTH = ['0to1_0', '0to1_1', '0to1_2', '0to1_3', 'NtoC_1_0', 'NtoC_1_1', 'StoC_1_0', 'StoC_1_1', \
+                                                '1to2_0', '1to2_1', '1to2_2', '1to2_3', 'NtoC_2_0', 'NtoC_2_1', 'StoC_2_0', 'StoC_2_1', \
+                                                '2to3_0', '2to3_1', '2to3_2', '2to3_3', 'NtoC_3_0', 'NtoC_3_1', 'StoC_3_0', 'StoC_3_1', \
+                                                '3to4_0', '3to4_1', '3to4_2', '3to4_3', 'NtoC_4_0', 'NtoC_4_1', 'StoC_4_0', 'StoC_4_1']
+            DISTANCE_OF_ROUTE = {"route1": 830, "route1A": 320, "route1B": 320, "route2A": 320, "route2B": 320, \
+                                "route3A": 320, "route3B": 320, "route4A": 320, "route4B": 320}    
+            INTERSECTION_NAMES = ['node1', 'node2', 'node3', 'node4']
+
         elif args.net_file == '4x2-intersections':
             LIST_INCOMING_LANES =   {
                             'node1': ['0Ato1A_0', '0Ato1A_1', '2Ato1A_0', '2Ato1A_1', 'Nto1A_0', 'Nto1A_1', '1Bto1A_0', '1Bto1A_1'],
@@ -68,7 +82,7 @@ class Environment():
                                 ]
             DISTANCE_OF_ROUTE = {"route1A5A": 830, "route1B5B": 830, "route1NS": 490, "route1SN": 490, "route2NS": 490, "route2SN": 490, \
                                 "route3NS": 490, "route3SN": 490, "route4NS": 490, "route4SN": 490}
-            TRAFFIC_SIGNAL_LIGHT_NAMES = ['node1', 'node2', 'node3', 'node4', 'node1B', 'node2B', 'node3B', 'node4B']
+            INTERSECTION_NAMES = ['node1', 'node2', 'node3', 'node4', 'node1B', 'node2B', 'node3B', 'node4B']
 
 
         STEP_SIZE = args.step_size
@@ -97,14 +111,14 @@ class Environment():
         number_veh_on_coming_lanes_allowed = 0
         number_waiting_veh_on_coming_lanes_disallowed = 0
         number_veh_on_coming_lanes_disallowed = 0
-        if currentPhase == 0:
+        if currentPhase == 2:
             for lane in LIST_INCOMING_LANES[agent][0:4]:
                 number_waiting_veh_on_coming_lanes_allowed += traci.lane.getLastStepHaltingNumber(lane)
                 number_veh_on_coming_lanes_allowed += self.get_number_vehicle_on_lane(lane)
             for lane in LIST_INCOMING_LANES[agent][4:]:
                 number_waiting_veh_on_coming_lanes_disallowed += traci.lane.getLastStepHaltingNumber(lane)
                 number_veh_on_coming_lanes_disallowed += self.get_number_vehicle_on_lane(lane)
-        elif currentPhase == 2:
+        elif currentPhase == 0:
             for lane in LIST_INCOMING_LANES[agent][0:4]:
                 number_waiting_veh_on_coming_lanes_disallowed += traci.lane.getLastStepHaltingNumber(lane)
                 number_veh_on_coming_lanes_disallowed += self.get_number_vehicle_on_lane(lane)
