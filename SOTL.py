@@ -153,7 +153,8 @@ class Simulation_SOTL():
                                                                         self.vehicle_tracker[vehicleId]['travel_time'],\
                                                                         self.vehicle_tracker[vehicleId]['average_speed']))
         if exceedTimeSimulation:
-            for vehicleId in self.vehicle_tracker.keys():
+
+            for vehicleId in list(self.vehicle_tracker):
                 if self.vehicle_tracker[vehicleId]['arrived'] == None:
                     self.vehicle_tracker[vehicleId]['arrived'] = step
                     self.vehicle_tracker[vehicleId]['travel_time'] = self.vehicle_tracker[vehicleId]['arrived'] - self.vehicle_tracker[vehicleId]['departed']

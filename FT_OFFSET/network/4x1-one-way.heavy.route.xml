@@ -9,8 +9,8 @@
     <route id="route4A" edges="StoC_4 CtoN_4"/>
     <route id="route4B" edges="NtoC_4 CtoS_4"/>
 
-    <flow id="01A" type="passenger" begin="0" end="3600" probability="0.05" route="route1" departLane="random"/>
-    <flow id="01B" type="moped" begin="0" end="3600" probability="0.2" route="route1" departLane="random"/>
+    <flow id="01A" type="passenger" begin="0" end="3600" probability="0.2" route="route1" departLane="random"/>
+    <flow id="01B" type="moped" begin="0" end="3600" probability="0.8" route="route1" departLane="random"/>
 
     <flow id="1AC" type="passenger" begin="0" end="3600" probability="0.005" route="route1A" departLane="random"/>
     <flow id="1AM" type="moped" begin="0" end="3600" probability="0.02" route="route1A" departLane="random"/>

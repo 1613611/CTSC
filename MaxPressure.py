@@ -196,8 +196,6 @@ class Simulation_SOTL():
 
     def changePhase(self):
         flags = dict()
-        allowed_pressure = 0
-        disallowed_pressure = 0
         for tls in TRAFFIC_SIGNAL_LIGHT_NAMES:
             currentPhase = traci.trafficlight.getPhase(tls)
 
@@ -206,7 +204,6 @@ class Simulation_SOTL():
             for idx in range(8):
                 pressure_array.append(traci.lane.getLastStepVehicleNumber(LIST_INCOMING_LANES[tls][idx]) \
                                         - traci.lane.getLastStepVehicleNumber(LIST_OUTGOING_LANES[tls][idx]))   
-            willChange = False
             if (currentPhase == 2 and np.sum(pressure_array[0:4]) < np.sum(pressure_array[4:8]))\
                     or (currentPhase == 0 and np.sum(pressure_array[0:4]) > np.sum(pressure_array[4:8])):
                 traci.trafficlight.setPhase(tls, currentPhase + 1)

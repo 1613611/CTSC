@@ -60,14 +60,14 @@ elif args.net_file == '4x2-intersections':
 
 if args.heavy_traffic:
     sumoCmd.extend(['-r', './network/%s.heavy.route.xml' % args.net_file])
-    LOG_QUEUE_LENGTH_FILE_NAME = './log/%s/heavy-traffic/FT/queue-length.txt' % args.net_file
-    LOG_VEHICLE_FILE_NAME = './log/%s/heavy-traffic/FT/vehicle.txt' % args.net_file
-    LOG_TRAFFIC_LIGHT_FILE_NAME = './log/%s/heavy-traffic/FT/traffic-light.txt' % args.net_file
+    LOG_QUEUE_LENGTH_FILE_NAME = './log/%s/heavy-traffic/FT_OFFSET/queue-length.txt' % args.net_file
+    LOG_VEHICLE_FILE_NAME = './log/%s/heavy-traffic/FT_OFFSET/vehicle.txt' % args.net_file
+    LOG_TRAFFIC_LIGHT_FILE_NAME = './log/%s/heavy-traffic/FT_OFFSET/traffic-light.txt' % args.net_file
 elif args.light_traffic:
     sumoCmd.extend(['-r', './network/%s.light.route.xml' % args.net_file])
-    LOG_QUEUE_LENGTH_FILE_NAME = './log/%s/light-traffic/FT/queue-length.txt' % args.net_file
-    LOG_VEHICLE_FILE_NAME = './log/%s/light-traffic/FT/vehicle.txt' % args.net_file
-    LOG_TRAFFIC_LIGHT_FILE_NAME = './log/%s/light-traffic/FT/traffic-light.txt' % args.net_file
+    LOG_QUEUE_LENGTH_FILE_NAME = './log/%s/light-traffic/FT_OFFSET/queue-length.txt' % args.net_file
+    LOG_VEHICLE_FILE_NAME = './log/%s/light-traffic/FT_OFFSET/vehicle.txt' % args.net_file
+    LOG_TRAFFIC_LIGHT_FILE_NAME = './log/%s/light-traffic/FT_OFFSET/traffic-light.txt' % args.net_file
 
 
 
@@ -77,7 +77,6 @@ OFFSET = 15
 class Simulation_FT():
     def __init__(self):
         traci.start(sumoCmd)
-        self.current_phase_duration = 0
         self.queue_length_per_step = []
 
         os.makedirs(os.path.dirname(LOG_TRAFFIC_LIGHT_FILE_NAME), exist_ok=True)
@@ -100,7 +99,6 @@ class Simulation_FT():
 
     def nextStep(self):
         self.log_step()
-        self.current_phase_duration += 1
         traci.simulationStep()
 
     def log_step(self):
