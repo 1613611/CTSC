@@ -1,7 +1,7 @@
 # multi-agent-TSC
 <h3>Use the fixed-time control as the bellow command:</h3>
 
->python FT.py --test-site 4-arterial-intersections --light-traffic --gui
+>python FT.py --test-site 4x1-two-way --light-traffic --gui
 
 Where:
 - **--test-site test_site** to select the test site

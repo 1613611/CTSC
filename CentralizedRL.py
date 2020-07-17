@@ -56,7 +56,7 @@ GAMMA = args.gamma
 # Creat the environment 
 env = Environment(args)
 
-if args.net_file == '4-arterial-intersections':
+if args.net_file == '4x1-two-way':
     agent_names = ['node1', 'node2', 'node3', 'node4']
     N_AGENTS = 4
     LIST_INCOMING_LANES_LOG_QUEUE_LENGTH = [ '0to1_0', 'NtoC_1_0', '2to1_0', 'StoC_1_0', '1to2_0', 'NtoC_2_0', '3to2_0', 'StoC_2_0',\
@@ -87,13 +87,11 @@ elif args.net_file == '4x2-intersections':
 if args.heavy_traffic:
     LOG_QUEUE_LENGTH_FILE_NAME = './log/%s/heavy-traffic/CentralizedRL/queue-length' % args.net_file
     LOG_VEHICLE_FILE_NAME = './log/%s/heavy-traffic/CentralizedRL/vehicle' % args.net_file
-
     LOG_TRAFFIC_LIGHT_FILE_NAME = './log/%s/heavy-traffic/CentralizedRL/traffic-light.txt' % args.net_file
 
 elif args.light_traffic:
     LOG_QUEUE_LENGTH_FILE_NAME = './log/%s/light-traffic/CentralizedRL/queue-length' % args.net_file
     LOG_VEHICLE_FILE_NAME = './log/%s/light-traffic/CentralizedRL/vehicle' % args.net_file
-
     LOG_TRAFFIC_LIGHT_FILE_NAME = './log/%s/light-traffic/CentralizedRL/traffic-light.txt' % args.net_file
 
 # Create multi models, memories of agents

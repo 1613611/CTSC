@@ -1,6 +1,6 @@
-python FT.py --test-site 4-arterial-intersections --light-traffic
+python FT.py --test-site 4x1-two-way --light-traffic
 
-python FT_OFFSET.py --test-site 4-arterial-intersections --light-traffic
+python FT_OFFSET.py --test-site 4x1-two-way --light-traffic
 
 python SOTL.py --test-site 4x1-one-way --max-step 7200 --light-traffic
 

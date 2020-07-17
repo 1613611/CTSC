@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2020年07月16日 16時56分21秒 by Eclipse SUMO netedit Version 1.2.0
+<!-- generated on 2020年07月17日 15時45分51秒 by Eclipse SUMO netedit Version 1.2.0
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
 
     <input>
-        <sumo-net-file value="/home/vtoan/4th%20FDSE/multi-agent-TSC/network/4-arterial-intersections.net.xml"/>
+        <sumo-net-file value="/home/vtoan/4th%20FDSE/multi-agent-TSC/FT_OFFSET/network/4x1-two-way.net.xml"/>
     </input>
 
     <output>
-        <output-file value="/home/vtoan/4th%20FDSE/multi-agent-TSC/network/4-arterial-intersections.net.xml"/>
+        <output-file value="/home/vtoan/4th%20FDSE/multi-agent-TSC/FT_OFFSET/network/4x1-two-way.net.xml"/>
     </output>
 
     <processing>
@@ -369,28 +369,28 @@
     </edge>
 
     <tlLogic id="node1" type="static" programID="0" offset="0">
-        <phase duration="1000000" state="rrrrGGGgrrrrGGGg"/>
-        <phase duration="1000000" state="rrrryyyyrrrryyyy"/>
-        <phase duration="1000000" state="GGGgrrrrGGGgrrrr"/>
-        <phase duration="1000000" state="yyyyrrrryyyyrrrr"/>
+        <phase duration="20" state="GGGgrrrrGGGgrrrr"/>
+        <phase duration="3"  state="yyyyrrrryyyyrrrr"/>
+        <phase duration="20" state="rrrrGGGgrrrrGGGg"/>
+        <phase duration="3"  state="rrrryyyyrrrryyyy"/>
     </tlLogic>
-    <tlLogic id="node2" type="static" programID="0" offset="0">
-        <phase duration="1000000" state="rrrrGGGgrrrrGGGgg"/>
-        <phase duration="1000000" state="rrrryyyyrrrryyyyy"/>
-        <phase duration="1000000" state="GGGgrrrrGGGgrrrrr"/>
-        <phase duration="1000000" state="yyyyrrrryyyyrrrrr"/>
+    <tlLogic id="node2" type="static" programID="0" offset="7.50">
+        <phase duration="20" state="GGGgrrrrGGGgrrrrr"/>
+        <phase duration="3"  state="yyyyrrrryyyyrrrrr"/>
+        <phase duration="20" state="rrrrGGGgrrrrGGGgg"/>
+        <phase duration="3"  state="rrrryyyyrrrryyyyy"/>
     </tlLogic>
-    <tlLogic id="node3" type="static" programID="0" offset="0">
-        <phase duration="1000000" state="rrrrGGGgrrrrGGGg"/>
-        <phase duration="1000000" state="rrrryyyyrrrryyyy"/>
-        <phase duration="1000000" state="GGGgrrrrGGGgrrrr"/>
-        <phase duration="1000000" state="yyyyrrrryyyyrrrr"/>
+    <tlLogic id="node3" type="static" programID="0" offset="15">
+        <phase duration="20" state="GGGgrrrrGGGgrrrr"/>
+        <phase duration="3"  state="yyyyrrrryyyyrrrr"/>
+        <phase duration="20" state="rrrrGGGgrrrrGGGg"/>
+        <phase duration="3"  state="rrrryyyyrrrryyyy"/>
     </tlLogic>
-    <tlLogic id="node4" type="static" programID="0" offset="0">
-        <phase duration="1000000" state="rrrrGGGgrrrrGGGg"/>
-        <phase duration="1000000" state="rrrryyyyrrrryyyy"/>
-        <phase duration="1000000" state="GGGgrrrrGGGgrrrr"/>
-        <phase duration="1000000" state="yyyyrrrryyyyrrrr"/>
+    <tlLogic id="node4" type="static" programID="0" offset="22.50">
+        <phase duration="20" state="GGGgrrrrGGGgrrrr"/>
+        <phase duration="3"  state="yyyyrrrryyyyrrrr"/>
+        <phase duration="20" state="rrrrGGGgrrrrGGGg"/>
+        <phase duration="3"  state="rrrryyyyrrrryyyy"/>
     </tlLogic>
 
     <junction id="1" type="priority" x="0.00" y="300.00" incLanes="1to0_0 1to0_1" intLanes=":1_0_0" shape="0.00,300.00 0.00,308.00 0.00,300.00">

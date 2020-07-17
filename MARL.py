@@ -55,7 +55,7 @@ GAMMA = args.gamma
 # Creat the environment 
 env = Environment(args)
 
-if args.net_file == '4-arterial-intersections':
+if args.net_file == '4x1-two-way':
     agent_names = ['node1', 'node2', 'node3', 'node4']
     LIST_INCOMING_LANES_LOG_QUEUE_LENGTH =   {
                                 'node1': ['0Ato1A_0', '0Ato1A_1', '2Ato1A_0', '2Ato1A_1', 'Nto1A_0', 'Nto1A_1', '1Bto1A_0', '1Bto1A_1'],

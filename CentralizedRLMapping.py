@@ -56,7 +56,7 @@ GAMMA = args.gamma
 # Creat the environment 
 env = Environment(args)
 
-if args.net_file == '4-arterial-intersections':
+if args.net_file == '4x1-two-way':
     agent_names = ['node1', 'node2', 'node3', 'node4']
     N_AGENTS = 4
 if args.heavy_traffic:
@@ -240,7 +240,7 @@ for epi in range(N_EPISODES_TRAIN):
     log_QL_address = LOG_QUEUE_LENGTH_FILE_NAME + '/%d.txt' % epi
     os.makedirs(os.path.dirname(log_QL_address), exist_ok=True)
     log_QL_file = open(log_QL_address, "w")
-    if args.net_file == '4-arterial-intersections':
+    if args.net_file == '4x1-two-way':
         log_QL_file.write('STEP,W11,W12,N11,N12,E11,E12,S11,S12,W21,W22,N21,N22,E21,E22,S21,S22,W31,W32,N31,N32,E31,E32,S31,S32,W41,W42,N41,N42,E41,E42,S41,S42\n')
     for idx, q_length in enumerate(log_QL):
         str_q_length = str(idx)

@@ -30,7 +30,7 @@ class Environment():
             sumoCmd.extend(['-r', './network/%s.light.route.xml' % args.net_file])
         self.sumoCmd = sumoCmd.copy()
 
-        if args.net_file == '4-arterial-intersections':
+        if args.net_file == '4x1-two-way':
             LIST_INCOMING_LANES =   {
                                         'node1': ['0to1_0', '0to1_1', '2to1_0', '2to1_1', 'NtoC_1_0', 'NtoC_1_1', 'StoC_1_0', 'StoC_1_1'],
                                         'node2': ['1to2_0', '1to2_1', '3to2_0', '3to2_1', 'NtoC_2_0', 'NtoC_2_1', 'StoC_2_0', 'StoC_2_1'],

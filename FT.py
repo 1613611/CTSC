@@ -27,7 +27,7 @@ sumoCmd = [sumoBinary, sumoConfig[0], sumoConfig[1]]
 
 sumoCmd.extend(['-n', './network/%s.net.xml' % args.net_file])
 
-if args.net_file == '4-arterial-intersections':
+if args.net_file == '4x1-two-way':
     LIST_INCOMING_LANES_LOG_QUEUE_LENGTH = [ '0to1_0', 'NtoC_1_0', '2to1_0', 'StoC_1_0', '1to2_0', 'NtoC_2_0', '3to2_0', 'StoC_2_0',\
                             '2to3_0', 'NtoC_3_0', '4to3_0', 'StoC_3_0', '3to4_0', 'NtoC_4_0', '5to4_0', 'StoC_4_0',\
                             '0to1_1', 'NtoC_1_1', '2to1_1', 'StoC_1_1', '1to2_1', 'NtoC_2_1', '3to2_1', 'StoC_2_1',\
