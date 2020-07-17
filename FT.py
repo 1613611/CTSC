@@ -70,8 +70,8 @@ elif args.light_traffic:
 
 
 
-PHASE_1_LENGTH = 15
-PHASE_2_LENGTH = 15
+PHASE_1_LENGTH = 20
+PHASE_2_LENGTH = 20
 
 class Simulation_FT():
     def __init__(self):

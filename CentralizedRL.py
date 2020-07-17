@@ -283,9 +283,9 @@ for epi in range(N_EPISODES_TRAIN):
 
     if args.train == True:
         if args.heavy_traffic:
-            name_file = "./model/Centralized/%s/heavy-traffic/model.h5" % args.net_file
+            name_file = "./model/%s/heavy-traffic/Centralized/model.h5" % args.net_file
         elif args.light_traffic:
-            name_file = "model/Centralized/%s/light-traffic/model.h5" % args.net_file
+            name_file = "model/%s/light-traffic/Centralized/model.h5" % args.net_file
         os.makedirs(os.path.dirname(name_file), exist_ok=True)
         model.save_weights(name_file)
 
