@@ -11,11 +11,11 @@
     <route id="route4NS" edges="Nto4A 4Ato4B 4BtoS"/>
     <route id="route4SN" edges="Sto4B 4Bto4A 4AtoN"/>
 
-    <flow id="01AC" type="passenger" begin="0" end="3600" probability="0.05" route="route1A5A" departLane="random"/>
-    <flow id="01AM" type="moped" begin="0" end="3600" probability="0.2" route="route1A5A" departLane="random"/>
+    <flow id="01AC" type="passenger" begin="0" end="3600" probability="0.2" route="route1A5A" departLane="random"/>
+    <flow id="01AM" type="moped" begin="0" end="3600" probability="0.8" route="route1A5A" departLane="random"/>
 
-    <flow id="01BC" type="passenger" begin="0" end="3600" probability="0.05" route="route5B1B" departLane="random"/>
-    <flow id="01BM" type="moped" begin="0" end="3600" probability="0.2" route="route5B1B" departLane="random"/>
+    <flow id="01BC" type="passenger" begin="0" end="3600" probability="0.2" route="route5B1B" departLane="random"/>
+    <flow id="01BM" type="moped" begin="0" end="3600" probability="0.8" route="route5B1B" departLane="random"/>
 
     <flow id="01NSC" type="passenger" begin="0" end="3600" probability="0.005" route="route1NS" departLane="random"/>
     <flow id="01NSM" type="moped" begin="0" end="3600" probability="0.02" route="route1NS" departLane="random"/>

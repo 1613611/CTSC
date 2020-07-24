@@ -73,22 +73,21 @@ elif args.net_file == '4x1-one-way':
 elif args.net_file == '4x2-intersections':
     agent_names = ['node1', 'node2', 'node3', 'node4', 'node1B', 'node2B', 'node3B', 'node4B']
     N_AGENTS = 8
-    LIST_INCOMING_LANES_LOG_QUEUE_LENGTH = [ '0Ato1A_0', '0Ato1A_1', '2Ato1A_0', '2Ato1A_1', 'Nto1A_0', 'Nto1A_1', '1Bto1A_0', '1Bto1A_1',\
-                        '1Ato2A_0', '1Ato2A_1', '3Ato2A_0', '3Ato2A_1', 'Nto2A_0', 'Nto2A_1', '2Bto2A_0', '2Bto2A_1',\
-                        '2Ato3A_0', '2Ato3A_1', '4Ato3A_0', '4Ato3A_1', 'Nto3A_0', 'Nto3A_1', '3Bto3A_0', '3Bto3A_1',\
-                        '3Ato4A_0', '3Ato4A_1', '5Ato4A_0', '5Ato4A_1', 'Nto4A_0', 'Nto4A_1', '4Bto4A_0', '4Bto4A_1',\
-                        '0Bto1B_0', '0Bto1B_1', '2Bto1B_0', '2Bto1B_1', '1Ato1B_0', '1Ato1B_1', 'Sto1B_0', 'Sto1B_1',\
-                        '1Bto2B_0', '1Bto2B_1', '3Bto2B_0', '3Bto2B_1', '2Ato2B_0', '2Ato2B_1', 'Sto2B_0', 'Sto2B_1',\
-                        '2Bto3B_0', '2Bto3B_1', '4Bto3B_0', '4Bto3B_1', '3Ato3B_0', '3Ato3B_1', 'Sto3B_0', 'Sto3B_1',\
-                        '3Bto4B_0', '3Bto4B_1', '5Bto4B_0', '5Bto4B_1', '4Ato4B_0', '4Ato4B_1', 'Sto4B_0', 'Sto4B_1',\
-                    ]
+    LIST_INCOMING_LANES_LOG_QUEUE_LENGTH = [ '0Ato1A_0', '0Ato1A_1', '0Ato1A_2', '0Ato1A_3', 'Nto1A_0', 'Nto1A_1', '1Bto1A_0', '1Bto1A_1',\
+                            '1Ato2A_0', '1Ato2A_1', '1Ato2A_2', '1Ato2A_3', 'Nto2A_0', 'Nto2A_1', '2Bto2A_0', '2Bto2A_1',\
+                            '2Ato3A_0', '2Ato3A_1', '2Ato3A_2', '2Ato3A_3', 'Nto3A_0', 'Nto3A_1', '3Bto3A_0', '3Bto3A_1',\
+                            '3Ato4A_0', '3Ato4A_1', '3Ato4A_2', '3Ato4A_3', 'Nto4A_0', 'Nto4A_1', '4Bto4A_0', '4Bto4A_1',\
+                            '2Bto1B_0', '2Bto1B_1', '2Bto1B_2', '2Bto1B_3', '1Ato1B_0', '1Ato1B_1', 'Sto1B_0', 'Sto1B_1',\
+                            '3Bto2B_0', '3Bto2B_1', '3Bto2B_2', '3Bto2B_3', '2Ato2B_0', '2Ato2B_1', 'Sto2B_0', 'Sto2B_1',\
+                            '4Bto3B_0', '4Bto3B_1', '4Bto3B_2', '4Bto3B_3', '3Ato3B_0', '3Ato3B_1', 'Sto3B_0', 'Sto3B_1',\
+                            '5Bto4B_0', '5Bto4B_1', '5Bto4B_2', '5Bto4B_3', '4Ato4B_0', '4Ato4B_1', 'Sto4B_0', 'Sto4B_1',\
+                        ]
 
 
 if args.heavy_traffic:
     LOG_QUEUE_LENGTH_FILE_NAME = './log/%s/heavy-traffic/CentralizedRL/queue-length' % args.net_file
     LOG_VEHICLE_FILE_NAME = './log/%s/heavy-traffic/CentralizedRL/vehicle' % args.net_file
     LOG_TRAFFIC_LIGHT_FILE_NAME = './log/%s/heavy-traffic/CentralizedRL/traffic-light.txt' % args.net_file
-
 elif args.light_traffic:
     LOG_QUEUE_LENGTH_FILE_NAME = './log/%s/light-traffic/CentralizedRL/queue-length' % args.net_file
     LOG_VEHICLE_FILE_NAME = './log/%s/light-traffic/CentralizedRL/vehicle' % args.net_file
@@ -138,6 +137,8 @@ if args.trial:
     log_QL, log_Veh, tls_log = env.get_log()
     t = PrettyTable(['Feature', 'Value'])
     t.add_row(['Average Queue Length', np.mean(log_QL)])
+    t.add_row(['Arterial Travel Time', np.mean([veh['travel_time'] for _, veh in log_Veh.items() if veh['routeID'] in ['route1', 'route2', 'route1A5A', 'route5B1B']])])
+    t.add_row(['Collector Travel Time', np.mean([veh['travel_time'] for _, veh in log_Veh.items() if veh['routeID'] not in ['route1', 'route2', 'route1A5A', 'route5B1B']])])
     t.add_row(['Average Travel Time', np.mean([veh['travel_time'] for _, veh in log_Veh.items()])])
     t.add_row(['Average Speed', np.mean([veh['average_speed'] for _, veh in log_Veh.items()])])  
     print(t)
@@ -152,6 +153,31 @@ if args.trial:
         log_tls_file.write('%d' % idx)
         [log_tls_file.write(',%d' % val) for val in log]
         log_tls_file.write('\n')
+
+    log_QL_address = LOG_QUEUE_LENGTH_FILE_NAME + '.txt'
+    os.makedirs(os.path.dirname(log_QL_address), exist_ok=True)
+    log_QL_file = open(log_QL_address, "w")
+    log_QL_file.write('step')
+    [log_QL_file.write(',%s' % lane) for lane in LIST_INCOMING_LANES_LOG_QUEUE_LENGTH]
+    log_QL_file.write('\n')
+    for idx, q_length in enumerate(log_QL):
+        str_q_length = str(idx)
+        for q in q_length:
+            str_q_length += ',%d' % q
+        log_QL_file.write(str_q_length + '\n')
+
+    log_Veh_address = LOG_VEHICLE_FILE_NAME + '.txt'
+    os.makedirs(os.path.dirname(log_Veh_address), exist_ok=True)
+    log_Veh_file = open(log_Veh_address, "w")
+    log_Veh_file.write('VehID,DepartedTime,ArrivedTime,RouteID,TravelTime,AverageSpeed\n')            
+
+    for vehicleId in log_Veh.keys():
+        log_Veh_file.write('%s,%f,%f,%s,%f,%f\n' % (vehicleId,  log_Veh[vehicleId]['departed'],\
+                                                                log_Veh[vehicleId]['arrived'],\
+                                                                log_Veh[vehicleId]['routeID'],\
+                                                                log_Veh[vehicleId]['travel_time'],\
+                                                                log_Veh[vehicleId]['average_speed']))
+
     sys.exit(0)
 
     

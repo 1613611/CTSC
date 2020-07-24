@@ -60,26 +60,26 @@ elif args.net_file == '4x1-one-way':
     TRAFFIC_SIGNAL_LIGHT_NAMES = ['node1', 'node2', 'node3', 'node4']
 elif args.net_file == '4x2-intersections':
     LIST_INCOMING_LANES =   {
-                                'node1': ['0Ato1A_0', '0Ato1A_1', '2Ato1A_0', '2Ato1A_1', 'Nto1A_0', 'Nto1A_1', '1Bto1A_0', '1Bto1A_1'],
-                                'node2': ['1Ato2A_0', '1Ato2A_1', '3Ato2A_0', '3Ato2A_1', 'Nto2A_0', 'Nto2A_1', '2Bto2A_0', '2Bto2A_1'],
-                                'node3': ['2Ato3A_0', '2Ato3A_1', '4Ato3A_0', '4Ato3A_1', 'Nto3A_0', 'Nto3A_1', '3Bto3A_0', '3Bto3A_1'],
-                                'node4': ['3Ato4A_0', '3Ato4A_1', '5Ato4A_0', '5Ato4A_1', 'Nto4A_0', 'Nto4A_1', '4Bto4A_0', '4Bto4A_1'],
-                                'node1B': ['0Bto1B_0', '0Bto1B_1', '2Bto1B_0', '2Bto1B_1', '1Ato1B_0', '1Ato1B_1', 'Sto1B_0', 'Sto1B_1'],
-                                'node2B': ['1Bto2B_0', '1Bto2B_1', '3Bto2B_0', '3Bto2B_1', '2Ato2B_0', '2Ato2B_1', 'Sto2B_0', 'Sto2B_1'],
-                                'node3B': ['2Bto3B_0', '2Bto3B_1', '4Bto3B_0', '4Bto3B_1', '3Ato3B_0', '3Ato3B_1', 'Sto3B_0', 'Sto3B_1'],
-                                'node4B': ['3Bto4B_0', '3Bto4B_1', '5Bto4B_0', '5Bto4B_1', '4Ato4B_0', '4Ato4B_1', 'Sto4B_0', 'Sto4B_1']
+                                'node1': ['0Ato1A_0', '0Ato1A_1', '0Ato1A_2', '0Ato1A_3', 'Nto1A_0', 'Nto1A_1', '1Bto1A_0', '1Bto1A_1'],
+                                'node2': ['1Ato2A_0', '1Ato2A_1', '1Ato2A_2', '1Ato2A_3', 'Nto2A_0', 'Nto2A_1', '2Bto2A_0', '2Bto2A_1'],
+                                'node3': ['2Ato3A_0', '2Ato3A_1', '2Ato3A_2', '2Ato3A_3', 'Nto3A_0', 'Nto3A_1', '3Bto3A_0', '3Bto3A_1'],
+                                'node4': ['3Ato4A_0', '3Ato4A_1', '3Ato4A_2', '3Ato4A_3', 'Nto4A_0', 'Nto4A_1', '4Bto4A_0', '4Bto4A_1'],
+                                'node1B': ['2Bto1B_0', '2Bto1B_1', '2Bto1B_2', '2Bto1B_3', '1Ato1B_0', '1Ato1B_1', 'Sto1B_0', 'Sto1B_1'],
+                                'node2B': ['3Bto2B_0', '3Bto2B_1', '3Bto2B_2', '3Bto2B_3', '2Ato2B_0', '2Ato2B_1', 'Sto2B_0', 'Sto2B_1'],
+                                'node3B': ['4Bto3B_0', '4Bto3B_1', '4Bto3B_2', '4Bto3B_3', '3Ato3B_0', '3Ato3B_1', 'Sto3B_0', 'Sto3B_1'],
+                                'node4B': ['5Bto4B_0', '5Bto4B_1', '5Bto4B_2', '5Bto4B_3', '4Ato4B_0', '4Ato4B_1', 'Sto4B_0', 'Sto4B_1']
                             }
 
-    LIST_INCOMING_LANES_LOG_QUEUE_LENGTH = [ '0Ato1A_0', '0Ato1A_1', '2Ato1A_0', '2Ato1A_1', 'Nto1A_0', 'Nto1A_1', '1Bto1A_0', '1Bto1A_1',\
-                            '1Ato2A_0', '1Ato2A_1', '3Ato2A_0', '3Ato2A_1', 'Nto2A_0', 'Nto2A_1', '2Bto2A_0', '2Bto2A_1',\
-                            '2Ato3A_0', '2Ato3A_1', '4Ato3A_0', '4Ato3A_1', 'Nto3A_0', 'Nto3A_1', '3Bto3A_0', '3Bto3A_1',\
-                            '3Ato4A_0', '3Ato4A_1', '5Ato4A_0', '5Ato4A_1', 'Nto4A_0', 'Nto4A_1', '4Bto4A_0', '4Bto4A_1',\
-                            '0Bto1B_0', '0Bto1B_1', '2Bto1B_0', '2Bto1B_1', '1Ato1B_0', '1Ato1B_1', 'Sto1B_0', 'Sto1B_1',\
-                            '1Bto2B_0', '1Bto2B_1', '3Bto2B_0', '3Bto2B_1', '2Ato2B_0', '2Ato2B_1', 'Sto2B_0', 'Sto2B_1',\
-                            '2Bto3B_0', '2Bto3B_1', '4Bto3B_0', '4Bto3B_1', '3Ato3B_0', '3Ato3B_1', 'Sto3B_0', 'Sto3B_1',\
-                            '3Bto4B_0', '3Bto4B_1', '5Bto4B_0', '5Bto4B_1', '4Ato4B_0', '4Ato4B_1', 'Sto4B_0', 'Sto4B_1',\
+    LIST_INCOMING_LANES_LOG_QUEUE_LENGTH = ['0Ato1A_0', '0Ato1A_1', '0Ato1A_2', '0Ato1A_3', 'Nto1A_0', 'Nto1A_1', '1Bto1A_0', '1Bto1A_1',\
+                            '1Ato2A_0', '1Ato2A_1', '1Ato2A_2', '1Ato2A_3', 'Nto2A_0', 'Nto2A_1', '2Bto2A_0', '2Bto2A_1',\
+                            '2Ato3A_0', '2Ato3A_1', '2Ato3A_2', '2Ato3A_3', 'Nto3A_0', 'Nto3A_1', '3Bto3A_0', '3Bto3A_1',\
+                            '3Ato4A_0', '3Ato4A_1', '3Ato4A_2', '3Ato4A_3', 'Nto4A_0', 'Nto4A_1', '4Bto4A_0', '4Bto4A_1',\
+                            '2Bto1B_0', '2Bto1B_1', '2Bto1B_2', '2Bto1B_3', '1Ato1B_0', '1Ato1B_1', 'Sto1B_0', 'Sto1B_1',\
+                            '3Bto2B_0', '3Bto2B_1', '3Bto2B_2', '3Bto2B_3', '2Ato2B_0', '2Ato2B_1', 'Sto2B_0', 'Sto2B_1',\
+                            '4Bto3B_0', '4Bto3B_1', '4Bto3B_2', '4Bto3B_3', '3Ato3B_0', '3Ato3B_1', 'Sto3B_0', 'Sto3B_1',\
+                            '5Bto4B_0', '5Bto4B_1', '5Bto4B_2', '5Bto4B_3', '4Ato4B_0', '4Ato4B_1', 'Sto4B_0', 'Sto4B_1',\
                         ]
-    DISTANCE_OF_ROUTE = {"route1A5A": 830, "route1B5B": 830, "route1NS": 490, "route1SN": 490, "route2NS": 490, "route2SN": 490, \
+    DISTANCE_OF_ROUTE = {"route1A5A": 830, "route5B1B": 830, "route1NS": 490, "route1SN": 490, "route2NS": 490, "route2SN": 490, \
                          "route3NS": 490, "route3SN": 490, "route4NS": 490, "route4SN": 490}
     TRAFFIC_SIGNAL_LIGHT_NAMES = ['node1', 'node2', 'node3', 'node4', 'node1B', 'node2B', 'node3B', 'node4B']
     
@@ -206,8 +206,10 @@ class Simulation_SOTL():
             
             t = PrettyTable(['Feature', 'Value'])
             t.add_row(['Average Queue Length', np.mean(self.queue_length_per_step)])
+            t.add_row(['Arterial Travel Time', np.mean([veh['travel_time'] for _, veh in self.vehicle_tracker.items() if veh['routeID'] in ['route1', 'route2', 'route1A5A', 'route5B1B']])])
+            t.add_row(['Collector Travel Time', np.mean([veh['travel_time'] for _, veh in self.vehicle_tracker.items() if veh['routeID'] not in ['route1', 'route2', 'route1A5A', 'route5B1B']])])
             t.add_row(['Average Travel Time', np.mean([veh['travel_time'] for _, veh in self.vehicle_tracker.items()])])
-            t.add_row(['Average Speed', np.mean([veh['average_speed'] for _, veh in self.vehicle_tracker.items()])])  
+            t.add_row(['Average Speed', np.mean([veh['average_speed'] for _, veh in self.vehicle_tracker.items()])])
             print(t)
 
             return True
@@ -217,8 +219,10 @@ class Simulation_SOTL():
 
             t = PrettyTable(['Feature', 'Value'])
             t.add_row(['Average Queue Length', np.mean(self.queue_length_per_step)])
+            t.add_row(['Arterial Travel Time', np.mean([veh['travel_time'] for _, veh in self.vehicle_tracker.items() if veh['routeID'] in ['route1', 'route2', 'route1A5A', 'route5B1B']])])
+            t.add_row(['Collector Travel Time', np.mean([veh['travel_time'] for _, veh in self.vehicle_tracker.items() if veh['routeID'] not in ['route1', 'route2', 'route1A5A', 'route5B1B']])])
             t.add_row(['Average Travel Time', np.mean([veh['travel_time'] for _, veh in self.vehicle_tracker.items()])])
-            t.add_row(['Average Speed', np.mean([veh['average_speed'] for _, veh in self.vehicle_tracker.items()])])  
+            t.add_row(['Average Speed', np.mean([veh['average_speed'] for _, veh in self.vehicle_tracker.items()])])
             print(t)
             return True
             
