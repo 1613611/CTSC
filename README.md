@@ -1,4 +1,4 @@
-# multi-agent-TSC
+# CTSC
 
 <h2> Args input </h2>
 
